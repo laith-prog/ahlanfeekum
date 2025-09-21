@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../home/presentation/pages/home_screen.dart';
 import '../../../search/presentation/pages/search_screen.dart';
 import '../../../search/presentation/bloc/search_bloc.dart';
+import '../../../property_rental/presentation/pages/rent_out_splash_screen.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../theming/colors.dart';
 import '../../../../theming/text_styles.dart';
@@ -31,10 +32,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: _buildBottomNavigation(),
     );
   }
@@ -57,22 +55,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(
-            icon: Icons.home_filled,
-            label: 'Home',
-            index: 0,
-          ),
+          _buildNavItem(icon: Icons.home_filled, label: 'Home', index: 0),
           _buildNavItem(
             icon: Icons.favorite_border,
             label: 'Favorite',
             index: 1,
           ),
           _buildAddButton(),
-          _buildNavItem(
-            icon: Icons.search,
-            label: 'Search',
-            index: 2,
-          ),
+          _buildNavItem(icon: Icons.search, label: 'Search', index: 2),
           _buildNavItem(
             icon: Icons.settings_outlined,
             label: 'Settings',
@@ -138,49 +128,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
           ],
         ),
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 28.sp,
-        ),
+        child: Icon(Icons.add, color: Colors.white, size: 28.sp),
       ),
     );
   }
 
   void _showAddBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-      ),
-      builder: (context) => Container(
-        padding: EdgeInsets.all(24.w),
-        height: 200.h,
-        child: Column(
-          children: [
-            Text(
-              'Add New Property',
-              style: AppTextStyles.h4.copyWith(
-                color: AppColors.textPrimary,
-                fontSize: 18.sp,
-              ),
-            ),
-            SizedBox(height: 16.h),
-            Text(
-              'This feature will be available soon!',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: Colors.grey[600],
-                fontSize: 14.sp,
-              ),
-            ),
-            SizedBox(height: 20.h),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
-        ),
-      ),
+    // Navigate to the rent out splash screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const RentOutSplashScreen()),
     );
   }
 }
@@ -207,10 +164,7 @@ class FavoriteScreen extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
-            Text(
-              'Coming Soon!',
-              style: TextStyle(color: Colors.grey),
-            ),
+            Text('Coming Soon!', style: TextStyle(color: Colors.grey)),
           ],
         ),
       ),
@@ -239,10 +193,7 @@ class SettingsScreen extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
-            Text(
-              'Coming Soon!',
-              style: TextStyle(color: Colors.grey),
-            ),
+            Text('Coming Soon!', style: TextStyle(color: Colors.grey)),
           ],
         ),
       ),

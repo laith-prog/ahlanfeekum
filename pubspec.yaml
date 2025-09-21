@@ -70,6 +70,10 @@ dependencies:
   image_picker: ^1.0.4
   country_code_picker: ^3.0.0
   
+  # Location Services
+  location: ^5.0.3
+  geocoding: ^3.0.0
+  
   # Utils
   intl: ^0.20.2
   url_launcher: ^6.2.1

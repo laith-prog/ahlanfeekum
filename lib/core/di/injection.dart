@@ -26,6 +26,16 @@ import '../../features/home/data/datasources/home_remote_data_source.dart';
 import '../../features/home/data/repositories/home_repository_impl.dart';
 import '../../features/home/domain/repositories/home_repository.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
+// Property Rental Imports
+import '../../features/property_rental/data/datasources/property_rental_remote_data_source.dart';
+import '../../features/property_rental/data/repositories/property_rental_repository_impl.dart';
+import '../../features/property_rental/domain/repositories/property_rental_repository.dart';
+import '../../features/property_rental/domain/usecases/create_property_step_one_usecase.dart';
+import '../../features/property_rental/domain/usecases/update_property_location_usecase.dart';
+import '../../features/property_rental/domain/usecases/add_property_availability_usecase.dart';
+import '../../features/property_rental/domain/usecases/upload_property_images_usecase.dart';
+import '../../features/property_rental/domain/usecases/set_property_price_usecase.dart';
+import '../../features/property_rental/presentation/bloc/property_rental_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -70,15 +80,21 @@ Future<void> initializeDependencies() async {
   );
 
   getIt.registerLazySingleton<SearchRepository>(
-    () => SearchRepositoryImpl(
-      remoteDataSource: getIt(),
-    ),
+    () => SearchRepositoryImpl(remoteDataSource: getIt()),
   );
 
   getIt.registerLazySingleton<HomeRepository>(
-    () => HomeRepositoryImpl(
-      remoteDataSource: getIt(),
-    ),
+    () => HomeRepositoryImpl(remoteDataSource: getIt()),
+  );
+
+  // Property Rental Data Sources
+  getIt.registerLazySingleton<PropertyRentalRemoteDataSource>(
+    () => PropertyRentalRemoteDataSourceImpl(getIt()),
+  );
+
+  // Property Rental Repositories
+  getIt.registerLazySingleton<PropertyRentalRepository>(
+    () => PropertyRentalRepositoryImpl(remoteDataSource: getIt()),
   );
 
   // Use cases
@@ -89,6 +105,13 @@ Future<void> initializeDependencies() async {
   getIt.registerLazySingleton(() => ConfirmPasswordResetUseCase(getIt()));
   getIt.registerLazySingleton(() => RegisterUserUseCase(getIt()));
   getIt.registerLazySingleton(() => SendOtpPhoneUseCase(getIt()));
+
+  // Property Rental Use Cases
+  getIt.registerLazySingleton(() => CreatePropertyStepOneUseCase(getIt()));
+  getIt.registerLazySingleton(() => UpdatePropertyLocationUseCase(getIt()));
+  getIt.registerLazySingleton(() => AddPropertyAvailabilityUseCase(getIt()));
+  getIt.registerLazySingleton(() => UploadPropertyImagesUseCase(getIt()));
+  getIt.registerLazySingleton(() => SetPropertyPriceUseCase(getIt()));
 
   // BLoC
   getIt.registerFactory(
@@ -102,14 +125,21 @@ Future<void> initializeDependencies() async {
     ),
   );
 
-  getIt.registerFactory(() => SearchBloc(
-    searchRepository: getIt(),
-    sharedPreferences: getIt(),
-  ));
+  getIt.registerFactory(
+    () => SearchBloc(searchRepository: getIt(), sharedPreferences: getIt()),
+  );
 
-  getIt.registerFactory(() => HomeBloc(
-    homeRepository: getIt(),
-  ));
+  getIt.registerFactory(() => HomeBloc(homeRepository: getIt()));
+
+  getIt.registerFactory(
+    () => PropertyRentalBloc(
+      createPropertyStepOneUseCase: getIt(),
+      updatePropertyLocationUseCase: getIt(),
+      addPropertyAvailabilityUseCase: getIt(),
+      uploadPropertyImagesUseCase: getIt(),
+      setPropertyPriceUseCase: getIt(),
+    ),
+  );
 
   // Registration Cubit
   getIt.registerFactory(() => RegistrationCubit(getIt()));
