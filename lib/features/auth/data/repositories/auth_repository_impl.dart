@@ -139,8 +139,11 @@ class AuthRepositoryImpl implements AuthRepository {
         final response = await remoteDataSource.verifyOtp(email, otp);
 
         if (response.code == 200 && response.data == true) {
-          // For OTP verification, we don't get user data back, just a boolean success
-          // We'll create a basic user with the email that was verified
+          // OTP verification successful, but we need to perform a login to get a valid token
+          // For now, we'll clear any existing tokens and require the user to login properly
+          await localDataSource.clearUserData();
+
+          // Return success but don't save invalid tokens
           final user = UserModel(
             id: '1', // We don't get userId from OTP verification
             email: email,
@@ -152,13 +155,10 @@ class AuthRepositoryImpl implements AuthRepository {
           final authResult = AuthResult(
             user: user,
             accessToken:
-                'otp_verified_token', // Placeholder token for OTP verification
+                '', // No token - user needs to login after OTP verification
           );
 
-          await localDataSource.saveUserData(user);
-          await localDataSource.saveTokens('otp_verified_token', null);
-          await localDataSource.setLoggedIn(true);
-
+          // Don't save login state - user needs to login after OTP verification
           return Right(authResult);
         } else {
           return Left(AuthFailure(response.message));
@@ -182,6 +182,13 @@ class AuthRepositoryImpl implements AuthRepository {
       final GoogleSignInAccount? account = await googleSignIn.signIn();
 
       if (account != null) {
+        // Get the Google authentication token
+        final GoogleSignInAuthentication auth = await account.authentication;
+
+        // TODO: Send Google token to your backend to exchange for your app's JWT token
+        // For now, we'll clear tokens and require proper login
+        await localDataSource.clearUserData();
+
         final user = UserModel(
           id: account.id,
           email: account.email,
@@ -193,13 +200,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
         final authResult = AuthResult(
           user: user,
-          accessToken: 'google_token', // You'll need to get actual token
+          accessToken:
+              '', // No token - need to implement Google token exchange with backend
         );
 
-        await localDataSource.saveUserData(user);
-        await localDataSource.saveTokens('google_token', null);
-        await localDataSource.setLoggedIn(true);
-
+        // Don't save login state until we have a valid backend token
         return Right(authResult);
       } else {
         return const Left(AuthFailure('Google sign in cancelled'));
@@ -260,7 +265,9 @@ class AuthRepositoryImpl implements AuthRepository {
         );
 
         if (response.code == 200) {
-          // For password reset, we don't get user data back, so we create a placeholder
+          // Password reset successful, but user needs to login with new password to get valid token
+          await localDataSource.clearUserData();
+
           final user = UserModel(
             id: '1',
             email: emailOrPhone,
@@ -272,9 +279,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
           final authResult = AuthResult(
             user: user,
-            accessToken: 'password_reset_token',
+            accessToken: '', // No token - user needs to login with new password
           );
 
+          // Don't save login state - user needs to login with new password
           return Right(authResult);
         } else {
           return Left(ServerFailure(response.message));

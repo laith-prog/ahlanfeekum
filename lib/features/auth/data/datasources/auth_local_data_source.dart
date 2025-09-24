@@ -14,6 +14,8 @@ abstract class AuthLocalDataSource {
   Future<void> setLoggedIn(bool isLoggedIn);
   Future<bool> isLoggedIn();
   Future<void> clearUserData();
+  Future<bool> hasValidToken();
+  Future<void> clearInvalidTokens();
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
@@ -35,15 +37,16 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<void> saveTokens(String accessToken, String? refreshToken) async {
     try {
-      await secureStorage.write(
-        key: AppConstants.accessTokenKey,
-        value: accessToken,
+      // Store tokens in SharedPreferences (used by DioFactory interceptor)
+      await sharedPreferences.setString(
+        AppConstants.accessTokenKey,
+        accessToken,
       );
 
       if (refreshToken != null) {
-        await secureStorage.write(
-          key: AppConstants.refreshTokenKey,
-          value: refreshToken,
+        await sharedPreferences.setString(
+          AppConstants.refreshTokenKey,
+          refreshToken,
         );
       }
     } catch (e) {
@@ -68,7 +71,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<String?> getAccessToken() async {
     try {
-      return await secureStorage.read(key: AppConstants.accessTokenKey);
+      return sharedPreferences.getString(AppConstants.accessTokenKey);
     } catch (e) {
       throw CacheException('Failed to get access token: $e');
     }
@@ -77,7 +80,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<String?> getRefreshToken() async {
     try {
-      return await secureStorage.read(key: AppConstants.refreshTokenKey);
+      return sharedPreferences.getString(AppConstants.refreshTokenKey);
     } catch (e) {
       throw CacheException('Failed to get refresh token: $e');
     }
@@ -106,10 +109,44 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     try {
       await sharedPreferences.remove(AppConstants.userDataKey);
       await sharedPreferences.remove(AppConstants.isLoggedInKey);
-      await secureStorage.delete(key: AppConstants.accessTokenKey);
-      await secureStorage.delete(key: AppConstants.refreshTokenKey);
+      await sharedPreferences.remove(AppConstants.accessTokenKey);
+      await sharedPreferences.remove(AppConstants.refreshTokenKey);
     } catch (e) {
       throw CacheException('Failed to clear user data: $e');
+    }
+  }
+
+  // Helper method to check if current token is valid (not a placeholder)
+  Future<bool> hasValidToken() async {
+    try {
+      final token = sharedPreferences.getString(AppConstants.accessTokenKey);
+      if (token == null || token.isEmpty) {
+        return false;
+      }
+
+      // Check if it's a placeholder token
+      const placeholderTokens = [
+        'otp_verified_token',
+        'google_token',
+        'password_reset_token',
+      ];
+
+      return !placeholderTokens.contains(token);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Helper method to clear invalid tokens
+  Future<void> clearInvalidTokens() async {
+    try {
+      final hasValid = await hasValidToken();
+      if (!hasValid) {
+        await clearUserData();
+        print('🧹 Cleared invalid authentication data');
+      }
+    } catch (e) {
+      print('🚨 Error clearing invalid tokens: $e');
     }
   }
 }

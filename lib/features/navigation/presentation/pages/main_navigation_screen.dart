@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../home/presentation/pages/home_screen.dart';
 import '../../../search/presentation/pages/search_screen.dart';
 import '../../../search/presentation/bloc/search_bloc.dart';
+// Removed direct import - using named route instead
 import '../../../../core/di/injection.dart';
 import '../../../../theming/colors.dart';
 import '../../../../theming/text_styles.dart';
@@ -120,8 +121,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget _buildAddButton() {
     return GestureDetector(
       onTap: () {
-        // TODO: Handle add property action
-        _showAddBottomSheet();
+        _navigateToAddProperty();
       },
       child: Container(
         width: 50.w,
@@ -147,41 +147,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  void _showAddBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-      ),
-      builder: (context) => Container(
-        padding: EdgeInsets.all(24.w),
-        height: 200.h,
-        child: Column(
-          children: [
-            Text(
-              'Add New Property',
-              style: AppTextStyles.h4.copyWith(
-                color: AppColors.textPrimary,
-                fontSize: 18.sp,
-              ),
-            ),
-            SizedBox(height: 16.h),
-            Text(
-              'This feature will be available soon!',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: Colors.grey[600],
-                fontSize: 14.sp,
-              ),
-            ),
-            SizedBox(height: 20.h),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
-        ),
-      ),
-    );
+  void _navigateToAddProperty() {
+    Navigator.pushNamed(context, '/rent-create');
   }
 }
 

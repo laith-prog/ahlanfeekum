@@ -1,0 +1,1052 @@
+{
+	"info": {
+		"_postman_id": "18a4e9d4-322a-41c4-8caa-bf032d808689",
+		"name": "AhlanFeekum",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "5365351"
+	},
+	"item": [
+		{
+			"name": "Add Site Propert Host",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"pm.collectionVariables.set(\"auth_token\", response.data.accessToken);\r",
+									" console.log(\"Token set:\", response.data.accessToken);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8NftcMhkUhNBvot8wQcEs2fJ5LR6igygu7Bn01mCHHmGnio_vWQsJY5wyDPk_4IR-GbTYAeYj1dy5yVukS9i6KxO9q_QYcSFmxhHKJQ00cLM_G4BYFZeqMgI8H08ui7TyGCnLPam5IR8WxfATXaOw_hUQ7HJB0OVjso3cnIh2bN2VOWRwaZKve-fpJkZb1Zjmg"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phoneoremail\": \"admin@abp.io\",\n  \"password\": \"1q2w3E*\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/mobile/auth/abp-login-url"
+					},
+					"response": []
+				},
+				{
+					"name": "create-site-property-step-one",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQl1_AR_i5Lvg5xrkKER_jlyVx_00RbVt3omsLzxQ_IOGszUT28Cq7amWPpuo5gFFE2W3RpdT276mHOUOAmWtn-kcRyyKFAhGcirihoW-knx3NlA3xhPC0HmL23J_faO1_KH384sjNFEk3m5wlcVdb5Yg4-15mNtfWWO4r8Sxd2zcg"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"propertyTitle\": \"Propert test 22-9-2025 version\",\n  \"hotelName\": \"string\",\n  \"bedrooms\": 3,\n  \"bathrooms\": 3,\n  \"numberOfBed\": 3,\n  \"floor\": 3,\n  \"maximumNumberOfGuest\": 3,\n  \"livingrooms\": 3,\n  \"propertyDescription\": \"string\",\n  \"hourseRules\": \"string\",\n  \"importantInformation\": \"string\",\n  \"address\": \"string\",\n  \"streetAndBuildingNumber\": \"string\",\n  \"landMark\": \"string\",\n  \"pricePerNight\": 0,\n  \"isActive\": true,\n  \"propertyTypeId\": \"5bdda3f8-1358-3440-6fe7-3a1c2f76d0b5\",\n  \"governorateId\": \"cf011073-46e0-c32a-ecc9-3a1c5604c0da\",\n  \"propertyFeatureIds\": [\n    \"5eb4b69b-1454-d5b1-0509-3a1c55e4a017\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/mobile/properties/create-step-one"
+					},
+					"response": []
+				},
+				{
+					"name": "STEP-TWO-ADRRESS-LAND-MAR",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQl1_AR_i5Lvg5xrkKER_jlyVx_00RbVt3omsLzxQ_IOGszUT28Cq7amWPpuo5gFFE2W3RpdT276mHOUOAmWtn-kcRyyKFAhGcirihoW-knx3NlA3xhPC0HmL23J_faO1_KH384sjNFEk3m5wlcVdb5Yg4-15mNtfWWO4r8Sxd2zcg"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"0082c70d-96ce-5389-eb2c-3a1c85053ed3\",\n  \"address\": \"addres jumraya\",\n  \"streetAndBuildingNumber\": \"123123\",\n  \"landMark\": \"123123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/mobile/properties/create-step-two"
+					},
+					"response": []
+				},
+				{
+					"name": "add-availabity",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQl1_AR_i5Lvg5xrkKER_jlyVx_00RbVt3omsLzxQ_IOGszUT28Cq7amWPpuo5gFFE2W3RpdT276mHOUOAmWtn-kcRyyKFAhGcirihoW-knx3NlA3xhPC0HmL23J_faO1_KH384sjNFEk3m5wlcVdb5Yg4-15mNtfWWO4r8Sxd2zcg"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"propertyId\": \"0082c70d-96ce-5389-eb2c-3a1c85053ed3\",\n    \"date\": \"2025-09-11\",\n    \"isAvailable\": true,\n    \"price\": 0,\n    \"note\": \"string\"\n  }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/mobile/properties/add-availability"
+					},
+					"response": []
+				},
+				{
+					"name": "upload-one-media",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQlb5zp9SFlUME9Fsd0lKozS0OilnhmeXkB7L4hqsbWsMV8GUuaHTdnqDA_JnbYsP3k4sM-6fhlFG7zupVFjDmPNUmWtHx-EH_uvVmBX9qRBAeWvqZWBWvLzsSKdFfd-sbLGzCjW7zBAfLnPctCkAf-Lo1PARVLzFTUN6HUqhMwR7g"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "PropertyId",
+									"value": "0082c70d-96ce-5389-eb2c-3a1c85053ed3",
+									"type": "text"
+								},
+								{
+									"key": "Image",
+									"contentType": "image/png",
+									"type": "file",
+									"src": "postman-cloud:///1f08ec48-3c33-4cf0-bc64-a44faf70012c"
+								},
+								{
+									"key": "Order",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "isActive",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{base_url}}/api/mobile/properties/upload-one-media"
+					},
+					"response": []
+				},
+				{
+					"name": "upload-medias",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQl1_AR_i5Lvg5xrkKER_jlyVx_00RbVt3omsLzxQ_IOGszUT28Cq7amWPpuo5gFFE2W3RpdT276mHOUOAmWtn-kcRyyKFAhGcirihoW-knx3NlA3xhPC0HmL23J_faO1_KH384sjNFEk3m5wlcVdb5Yg4-15mNtfWWO4r8Sxd2zcg"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"propertyId\": \"ce61d61c-ee92-03b2-3650-3a1c490b4f36\",\n    \"image\": \"string\",\n    \"order\": 0,\n    \"isActive\": true\n  }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/mobile/properties/upload-medias"
+					},
+					"response": []
+				},
+				{
+					"name": "set price",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQlb5zp9SFlUME9Fsd0lKozS0OilnhmeXkB7L4hqsbWsMV8GUuaHTdnqDA_JnbYsP3k4sM-6fhlFG7zupVFjDmPNUmWtHx-EH_uvVmBX9qRBAeWvqZWBWvLzsSKdFfd-sbLGzCjW7zBAfLnPctCkAf-Lo1PARVLzFTUN6HUqhMwR7g"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"propertyId\": \"0082c70d-96ce-5389-eb2c-3a1c85053ed3\",\n  \"pricePerNight\": 45\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/mobile/properties/set-price"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "confirm-password-reset",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQnTw4OF9p4W71e3dXAv97wpgNY6k-fDHoBGb7ISSX3vieI8yPPz2T0RUYkKEFE210zCFvtTdlwS8c3DB4U-dGRpxGSVWgRN0tJyk-I4EuKB5vqLc7tsksc0qj1tFPSAsUM"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"emailOrPhone\": \"adaioob@gmail.com\",\n  \"securityCode\": \"7487\",\n  \"newPassword\": \"Ass!12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/mobile/user-profiles/confirm-password-reset"
+					},
+					"response": []
+				},
+				{
+					"name": "password-reset-request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQnREGv4wzT7QoqZDJ7LG8v_P0BpA-tavgxeq1GNuvvt8N5ZA-rrIFoZg0OBzV5IFDDALA8TA_hp6MRZxiDrRaGOmau5gOlY7PZ-VXQRDMBAtzB78xhVQbVoyutsuJTNaaE"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"emailOrPhone\": \"adaioob@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/mobile/user-profiles/password-reset-request"
+					},
+					"response": []
+				},
+				{
+					"name": "verify",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQnREGv4wzT7QoqZDJ7LG8v_P0BpA-tavgxeq1GNuvvt8N5ZA-rrIFoZg0OBzV5IFDDALA8TA_hp6MRZxiDrRaGOmau5gOlY7PZ-VXQRDMBAtzB78xhVQbVoyutsuJTNaaE"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"emailOrPhone\": \"user@example.com\",\n  \"securityCode\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/mobile/user-profiles/verify"
+					},
+					"response": []
+				},
+				{
+					"name": "register-user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQnTw4OF9p4W71e3dXAv97wpgNY6k-fDHoBGb7ISSX3vieI8yPPz2T0RUYkKEFE210zCFvtTdlwS8c3DB4U-dGRpxGSVWgRN0tJyk-I4EuKB5vqLc7tsksc0qj1tFPSAsUM"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "ProfilePhoto",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "Name",
+									"value": "string",
+									"type": "text"
+								},
+								{
+									"key": "Latitude",
+									"value": "string",
+									"type": "text"
+								},
+								{
+									"key": "Longitude",
+									"value": "string",
+									"type": "text"
+								},
+								{
+									"key": "RoleId",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "Address",
+									"value": "string",
+									"type": "text"
+								},
+								{
+									"key": "PhoneNumber",
+									"value": "0931846622",
+									"type": "text"
+								},
+								{
+									"key": "IsSuperHost",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "Password",
+									"value": "Ass!12345678",
+									"type": "text"
+								},
+								{
+									"key": "Email",
+									"value": "adaioob2@gmail.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{base_url}}/api/mobile/user-profiles/register-user"
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"pm.collectionVariables.set(\"auth_token\", response.data.accessToken);\r",
+									" console.log(\"Token set:\", response.data.accessToken);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8NftcMhkUhNBvot8wQcEs2fJ5LR6igygu7Bn01mCHHmGnio_vWQsJY5wyDPk_4IR-GbTYAeYj1dy5yVukS9i6KxO9q_QYcSFmxhHKJQ00cLM_G4BYFZeqMgI8H08ui7TyGCnLPam5IR8WxfATXaOw_hUQ7HJB0OVjso3cnIh2bN2VOWRwaZKve-fpJkZb1Zjmg"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phoneoremail\": \"adaioob2@gmail.com\",\n  \"password\": \"Ass!12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/mobile/auth/abp-login-url"
+					},
+					"response": []
+				},
+				{
+					"name": "send-secret-key-email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"pm.collectionVariables.set(\"auth_token\", response.data.accessToken);\r",
+									" console.log(\"Token set:\", response.data.accessToken);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQl6P-7_TpMCI5r3blAX14lWzW0vsl__zHLy4Sk3B45iebPBRtk4-cslvNQGXz-sWCvvWtM8WtFica6hmv7geRZloUSAeucGTA9cCm8Oopz9NWmT2t_F0x2QxRxR89peTls"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/mobile/user-profiles/send-secret-key-email?email=adaioob%40gmail.com",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"mobile",
+								"user-profiles",
+								"send-secret-key-email"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "adaioob%40gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "LookUps",
+			"item": [
+				{
+					"name": "property-types",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"url": "{{base_url}}/api/mobile/lookups/property-types"
+					},
+					"response": []
+				},
+				{
+					"name": "property-features",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQl6P-7_TpMCI5r3blAX14lWzW0vsl__zHLy4Sk3B45iebPBRtk4-cslvNQGXz-sWCvvWtM8WtFica6hmv7geRZloUSAeucGTA9cCm8Oopz9NWmT2t_F0x2QxRxR89peTls"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"url": "{{base_url}}/api/mobile/lookups/property-features"
+					},
+					"response": []
+				},
+				{
+					"name": "governates",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQlPPx7wDkhwn9jjhpfKPP868tDRXY14wiRFLH32QrhRFYdwqhspGCV4aCSaxtOIIPoBBulkT9BP-a9UOIf-EV53ODgP9ZYneI0UBZEGLDPYH8Iku3yBMBeKNQESo9FhKmSNv8k3zzEm-R8NNxar4zLaZKjZEPXWD_K7tccFJCmxaA"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"url": "{{base_url}}/api/mobile/lookups/governates"
+					},
+					"response": []
+				},
+				{
+					"name": "statuses",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQlPPx7wDkhwn9jjhpfKPP868tDRXY14wiRFLH32QrhRFYdwqhspGCV4aCSaxtOIIPoBBulkT9BP-a9UOIf-EV53ODgP9ZYneI0UBZEGLDPYH8Iku3yBMBeKNQESo9FhKmSNv8k3zzEm-R8NNxar4zLaZKjZEPXWD_K7tccFJCmxaA"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"url": "{{base_url}}/api/mobile/lookups/statuses"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Property",
+			"item": [
+				{
+					"name": "PropertyDetails",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"url": "{{base_url}}/api/mobile/properties/with-details/C70C7164-0E1C-1D47-AC30-3A1C740FD6F3"
+					},
+					"response": []
+				},
+				{
+					"name": "add-to-favorite",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ3NTQ4RUI3MDg2REQ1Q0ZBMjlGNzMwRDRGQUZCNTQ0NkE1NTc3Q0UiLCJ4NXQiOiJSMVNPdHdodDFjLWluM01OVDYtMVJHcFZkODQiLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwOi8vc3J2OTU0MTg2LmhzdGdyLmNsb3VkOjUwMDAvIiwiZXhwIjoxNzYwODgyMDM0LCJpYXQiOjE3NTgyOTAwMzQsImF1ZCI6IkFobGFuRmVla3VtIiwic2NvcGUiOiJBaGxhbkZlZWt1bSIsImp0aSI6IjRkNGVhY2IxLTdjMjQtNGYxOC1iMDMzLTliNGJjMzM0MjU2YSIsInN1YiI6ImMxOTZlMDVmLTkxNjktNDNjZi1iY2Y4LTA1MDBlYWE3ZTFiNyIsInVuaXF1ZV9uYW1lIjoiYWRhaW9vYjJAZ21haWwuY29tIiwib2lfcHJzdCI6IkFobGFuRmVla3VtX1N3YWdnZXIiLCJvaV9hdV9pZCI6IjQxY2Y2M2E2LTc4ZjctM2M0Ny1lMGI0LTNhMWM3NDZkOTViMyIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkYWlvb2IyQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJzdHJpbmciLCJmYW1pbHlfbmFtZSI6InN0cmluZyIsInJvbGUiOiJHdWVzdCIsImVtYWlsIjoiYWRhaW9vYjJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOiJGYWxzZSIsInBob25lX251bWJlciI6Iis5NjMwOTMxODQ2NjIyIiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjoiRmFsc2UiLCJjbGllbnRfaWQiOiJBaGxhbkZlZWt1bV9Td2FnZ2VyIiwib2lfdGtuX2lkIjoiODYyNGYxMTktODE4Ni03OGIxLTEzYjQtM2ExYzc0NmQ5NzRiIn0.HnfF9q8WiN6krkjNxnSv13fSSTrdzilwcPvMt_iO-GXv-eU3g8RfYshCy3x_WMfvu2_6rgFz3xNhw8k9JaJm9r9JFbvLhLtiuJDKEje7Bx_R3Gw8HSeZf5GGqY3JTZKe73MB5EV6LxEDCUljEiSkLRCnYA2T83CNBP97RZgyjRL2w_-4koKi5wlnWO94BUI6cyi1-QDf8yh2sdjoJtQkKhb_7krYoAa57FaTqMMjEWvfaPtnfZlSYhD5RG-WfNU2HecMgqMhWhvKfLQLxpaOd1gaJffLOZQu56SRtIfzc18CaoZzHj_rVqEumO2xKizTnm3Ox5WwbPBzNc1aStI7Pw"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"url": "{{base_url}}/api/mobile/properties/add-to-favorite/c70c7164-0e1c-1d47-ac30-3a1c740fd6f3"
+					},
+					"response": []
+				},
+				{
+					"name": "remove from favorite",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ3NTQ4RUI3MDg2REQ1Q0ZBMjlGNzMwRDRGQUZCNTQ0NkE1NTc3Q0UiLCJ4NXQiOiJSMVNPdHdodDFjLWluM01OVDYtMVJHcFZkODQiLCJ0eXAiOiJhdCtqd3QifQ.eyJpc3MiOiJodHRwOi8vc3J2OTU0MTg2LmhzdGdyLmNsb3VkOjUwMDAvIiwiZXhwIjoxNzYwODgyMDM0LCJpYXQiOjE3NTgyOTAwMzQsImF1ZCI6IkFobGFuRmVla3VtIiwic2NvcGUiOiJBaGxhbkZlZWt1bSIsImp0aSI6IjRkNGVhY2IxLTdjMjQtNGYxOC1iMDMzLTliNGJjMzM0MjU2YSIsInN1YiI6ImMxOTZlMDVmLTkxNjktNDNjZi1iY2Y4LTA1MDBlYWE3ZTFiNyIsInVuaXF1ZV9uYW1lIjoiYWRhaW9vYjJAZ21haWwuY29tIiwib2lfcHJzdCI6IkFobGFuRmVla3VtX1N3YWdnZXIiLCJvaV9hdV9pZCI6IjQxY2Y2M2E2LTc4ZjctM2M0Ny1lMGI0LTNhMWM3NDZkOTViMyIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkYWlvb2IyQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJzdHJpbmciLCJmYW1pbHlfbmFtZSI6InN0cmluZyIsInJvbGUiOiJHdWVzdCIsImVtYWlsIjoiYWRhaW9vYjJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOiJGYWxzZSIsInBob25lX251bWJlciI6Iis5NjMwOTMxODQ2NjIyIiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjoiRmFsc2UiLCJjbGllbnRfaWQiOiJBaGxhbkZlZWt1bV9Td2FnZ2VyIiwib2lfdGtuX2lkIjoiODYyNGYxMTktODE4Ni03OGIxLTEzYjQtM2ExYzc0NmQ5NzRiIn0.HnfF9q8WiN6krkjNxnSv13fSSTrdzilwcPvMt_iO-GXv-eU3g8RfYshCy3x_WMfvu2_6rgFz3xNhw8k9JaJm9r9JFbvLhLtiuJDKEje7Bx_R3Gw8HSeZf5GGqY3JTZKe73MB5EV6LxEDCUljEiSkLRCnYA2T83CNBP97RZgyjRL2w_-4koKi5wlnWO94BUI6cyi1-QDf8yh2sdjoJtQkKhb_7krYoAa57FaTqMMjEWvfaPtnfZlSYhD5RG-WfNU2HecMgqMhWhvKfLQLxpaOd1gaJffLOZQu56SRtIfzc18CaoZzHj_rVqEumO2xKizTnm3Ox5WwbPBzNc1aStI7Pw"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"url": "{{base_url}}/api/mobile/properties/remove-from-favorite/c70c7164-0e1c-1d47-ac30-3a1c740fd6f3"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "UserProfile",
+			"item": [
+				{
+					"name": "user-profile-details without id current loged user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQkfcTYKdvkDgIIDr_UzocJ_xthdzrQTGgmGXoR-R494dXhcFrerGSsdyYj7dZh5tYoJ-4_Stb8mvUBNvx3BIsE682I8QZaASuPpWFXM3XVIa1FZcyfdzErZAQEsxyKl15KzA52EunzXKF49KH7thixOUlMj76SHh35Llm1sjJ1Rtw"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"url": "{{base_url}}/api/mobile/user-profiles/user-profile-details"
+					},
+					"response": []
+				},
+				{
+					"name": "user-profile-details with id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "RequestVerificationToken",
+								"value": "CfDJ8HmMiLg5PaFDuOVTFBwuMQkfcTYKdvkDgIIDr_UzocJ_xthdzrQTGgmGXoR-R494dXhcFrerGSsdyYj7dZh5tYoJ-4_Stb8mvUBNvx3BIsE682I8QZaASuPpWFXM3XVIa1FZcyfdzErZAQEsxyKl15KzA52EunzXKF49KH7thixOUlMj76SHh35Llm1sjJ1Rtw"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"url": "{{base_url}}/api/mobile/user-profiles/user-profile-details/599eba1d-b35b-02d3-6dda-3a1c2c406bdd"
+					},
+					"response": []
+				},
+				{
+					"name": "update-my-profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{auth_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Name",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "Email",
+									"value": "admin@abp.io",
+									"type": "text"
+								},
+								{
+									"key": "PhoneNumber",
+									"value": "string",
+									"type": "text"
+								},
+								{
+									"key": "Latitude",
+									"value": "string",
+									"type": "text"
+								},
+								{
+									"key": "Longitude",
+									"value": "string",
+									"type": "text"
+								},
+								{
+									"key": "Address",
+									"value": "damas",
+									"type": "text"
+								},
+								{
+									"key": "ProfilePhoto",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "IsProfilePhotoChanged",
+									"value": "false",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://srv954186.hstgr.cloud:5000/api/mobile/user-profiles/update-my-profile"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"pm.collectionVariables.set(\"auth_token\", response.data.accessToken);\r",
+							" console.log(\"Token set:\", response.data.accessToken);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "RequestVerificationToken",
+						"value": "CfDJ8NftcMhkUhNBvot8wQcEs2fJ5LR6igygu7Bn01mCHHmGnio_vWQsJY5wyDPk_4IR-GbTYAeYj1dy5yVukS9i6KxO9q_QYcSFmxhHKJQ00cLM_G4BYFZeqMgI8H08ui7TyGCnLPam5IR8WxfATXaOw_hUQ7HJB0OVjso3cnIh2bN2VOWRwaZKve-fpJkZb1Zjmg"
+					},
+					{
+						"key": "X-Requested-With",
+						"value": "XMLHttpRequest"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"phoneoremail\": \"admin@abp.io\" ,\n  \"password\": \"1q2w3E*\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{base_url}}/api/mobile/auth/abp-login-url"
+			},
+			"response": []
+		},
+		{
+			"name": "my-home",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{auth_token}}"
+					}
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "text/plain"
+					},
+					{
+						"key": "X-Requested-With",
+						"value": "XMLHttpRequest"
+					}
+				],
+				"url": "{{base_url}}/api/mobile/user-profiles/home"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "auth_token",
+			"value": ""
+		},
+		{
+			"key": "base_url",
+			"value": ""
+		},
+		{
+			"key": "base_url_server",
+			"value": ""
+		}
+	]
+}

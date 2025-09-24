@@ -1,0 +1,83 @@
+class PropertyCreationResult {
+  final bool success;
+  final String? propertyId;
+  final String message;
+  final dynamic data;
+
+  const PropertyCreationResult({
+    required this.success,
+    this.propertyId,
+    required this.message,
+    this.data,
+  });
+}
+
+class PropertyTypeEntity {
+  final String id;
+  final String name;
+  final String? description;
+  final bool isActive;
+
+  const PropertyTypeEntity({
+    required this.id,
+    required this.name,
+    this.description,
+    this.isActive = true,
+  });
+}
+
+class PropertyFeatureEntity {
+  final String id;
+  final String name;
+  final String? description;
+  final String? icon;
+  final bool isActive;
+
+  const PropertyFeatureEntity({
+    required this.id,
+    required this.name,
+    this.description,
+    this.icon,
+    this.isActive = true,
+  });
+}
+
+class GovernorateEntity {
+  final String id;
+  final String name;
+  final String? description;
+  final bool isActive;
+
+  const GovernorateEntity({
+    required this.id,
+    required this.name,
+    this.description,
+    this.isActive = true,
+  });
+}
+
+enum PropertyCreationStep {
+  propertyDetails(1, 'Property Details'),
+  location(2, 'Location'),
+  photos(3, 'Photos'),
+  price(4, 'Price'),
+  availability(5, 'Available In'),
+  review(6, 'Review');
+
+  const PropertyCreationStep(this.stepNumber, this.title);
+
+  final int stepNumber;
+  final String title;
+}
+
+class PropertyCreationStepStatus {
+  final PropertyCreationStep step;
+  final bool isCompleted;
+  final bool isActive;
+
+  const PropertyCreationStepStatus({
+    required this.step,
+    required this.isCompleted,
+    required this.isActive,
+  });
+}

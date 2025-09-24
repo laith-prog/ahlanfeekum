@@ -5,7 +5,6 @@ import '../bloc/search_bloc.dart';
 import '../bloc/search_event.dart';
 import '../bloc/search_state.dart';
 import '../../data/models/search_filter.dart';
-import 'search_results_screen.dart';
 import '../../../../theming/colors.dart';
 import '../../../../theming/text_styles.dart';
 
@@ -40,34 +39,72 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Search Properties',
+          'Search',
           style: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        centerTitle: true,
       ),
+      backgroundColor: Colors.white,
       body: BlocBuilder<SearchBloc, SearchState>(
         builder: (context, state) {
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildLocationField(),
-                SizedBox(height: 16.h),
-                _buildDateSection(),
-                SizedBox(height: 16.h),
-                _buildGuestsSection(),
-                SizedBox(height: 32.h),
-                _buildSearchButton(),
-                SizedBox(height: 24.h),
-                if (state is LookupsLoaded && state.recentSearches.isNotEmpty)
-                  _buildRecentSearches(state.recentSearches),
-              ],
-            ),
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(24.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSearchCard(),
+                      SizedBox(height: 32.h),
+                      if (state is LookupsLoaded && state.recentSearches.isNotEmpty)
+                        _buildRecentSearches(state.recentSearches),
+                    ],
+                  ),
+                ),
+              ),
+              _buildSearchButton(),
+            ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildSearchCard() {
+    return Container(
+      padding: EdgeInsets.all(24.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 0,
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildLocationField(),
+          SizedBox(height: 20.h),
+          _buildDateSection(),
+          SizedBox(height: 20.h),
+          _buildGuestsSection(),
+          SizedBox(height: 24.h),
+          Row(
+            children: [
+              Expanded(child: SizedBox()),
+              _buildFilterButton(),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -76,24 +113,25 @@ class _SearchScreenState extends State<SearchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Where are you going?',
-          style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
-        ),
-        SizedBox(height: 8.h),
         TextFormField(
           controller: _locationController,
           decoration: InputDecoration(
+            labelText: 'Where To?',
+            labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
             hintText: 'Enter destination',
-            prefixIcon: const Icon(Icons.location_on, color: AppColors.primary),
+            hintStyle: AppTextStyles.inputHint,
+            prefixIcon: Icon(Icons.location_on_outlined, color: AppColors.primary),
+            filled: true,
+            fillColor: AppColors.inputBackground,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.primary),
+              borderSide: BorderSide(color: AppColors.primary),
             ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           ),
         ),
       ],
@@ -101,21 +139,11 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildDateSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Text(
-          'When are you traveling?',
-          style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
-        ),
-        SizedBox(height: 8.h),
-        Row(
-          children: [
-            Expanded(child: _buildDateField('Check-in', _checkIn, true)),
-            SizedBox(width: 12.w),
-            Expanded(child: _buildDateField('Check-out', _checkOut, false)),
-          ],
-        ),
+        Expanded(child: _buildDateField('Check In', _checkIn, true)),
+        SizedBox(width: 16.w),
+        Expanded(child: _buildDateField('Check Out', _checkOut, false)),
       ],
     );
   }
@@ -124,25 +152,35 @@ class _SearchScreenState extends State<SearchScreen> {
     return GestureDetector(
       onTap: () => _selectDate(isCheckIn),
       child: Container(
-        padding: EdgeInsets.all(12.w),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
+          color: AppColors.inputBackground,
           borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.transparent),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Text(
-              label,
-              style: AppTextStyles.bodySmall.copyWith(color: Colors.grey[600]),
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              date != null
-                  ? '${date.day}/${date.month}/${date.year}'
-                  : 'Select date',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: date != null ? AppColors.textPrimary : Colors.grey[500],
+            Icon(Icons.calendar_today_outlined, color: AppColors.primary, size: 20.sp),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    date != null
+                        ? '${date.day}/${date.month}/${date.year}'
+                        : '1/Sep/2024',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -152,63 +190,138 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildGuestsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'How many guests?',
-          style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
-        ),
-        SizedBox(height: 8.h),
-        Container(
-          padding: EdgeInsets.all(12.w),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey[300]!),
-            borderRadius: BorderRadius.circular(12.r),
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+      decoration: BoxDecoration(
+        color: AppColors.inputBackground,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.transparent),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.person_outline, color: AppColors.primary, size: 20.sp),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Guests',
+                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  '$_guests Guests',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Row(
             children: [
-              Text(
-                '$_guests guests',
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: _guests > 1 ? () => setState(() => _guests--) : null,
-                    icon: const Icon(Icons.remove_circle_outline),
+              GestureDetector(
+                onTap: _guests > 1 ? () => setState(() => _guests--) : null,
+                child: Container(
+                  padding: EdgeInsets.all(4.w),
+                  decoration: BoxDecoration(
+                    color: _guests > 1 ? AppColors.primary.withOpacity(0.1) : Colors.grey[200],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.remove,
                     color: _guests > 1 ? AppColors.primary : Colors.grey[400],
+                    size: 16.sp,
                   ),
-                  IconButton(
-                    onPressed: () => setState(() => _guests++),
-                    icon: const Icon(Icons.add_circle_outline),
+                ),
+              ),
+              SizedBox(width: 8.w),
+              GestureDetector(
+                onTap: () => setState(() => _guests++),
+                child: Container(
+                  padding: EdgeInsets.all(4.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.add,
                     color: AppColors.primary,
+                    size: 16.sp,
                   ),
-                ],
+                ),
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterButton() {
+    return GestureDetector(
+      onTap: _openFilterScreen,
+      child: Container(
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: AppColors.border),
         ),
-      ],
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.tune, color: AppColors.textSecondary, size: 20.sp),
+            SizedBox(width: 4.w),
+            Text(
+              'Filter',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildSearchButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 50.h,
-      child: ElevatedButton(
-        onPressed: _onSearchButtonPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 0,
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
-        ),
-        child: Text(
-          'Search Properties',
-          style: AppTextStyles.h5.copyWith(color: Colors.white),
+        ],
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: 52.h,
+        child: ElevatedButton(
+          onPressed: _onSearchButtonPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            elevation: 0,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.search, color: Colors.white, size: 20.sp),
+              SizedBox(width: 8.w),
+              Text(
+                'Search',
+                style: AppTextStyles.buttonText.copyWith(color: Colors.white),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -219,29 +332,67 @@ class _SearchScreenState extends State<SearchScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Recent Searches',
+          'Recent Search',
           style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: 16.h),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: recentSearches.length,
+          itemCount: recentSearches.length.clamp(0, 3), // Limit to 3 recent searches
           itemBuilder: (context, index) {
             final search = recentSearches[index];
-            return Card(
-              margin: EdgeInsets.only(bottom: 8.h),
-              child: ListTile(
-                leading: const Icon(Icons.history, color: AppColors.primary),
-                title: Text(
-                  search.location ?? 'Any location',
-                  style: AppTextStyles.bodyMedium,
-                ),
-                subtitle: Text(
-                  '${search.guests ?? 1} guests • ${search.checkIn != null ? "${search.checkIn!.day}/${search.checkIn!.month}" : "Anytime"}',
-                  style: AppTextStyles.bodySmall.copyWith(color: Colors.grey[600]),
-                ),
-                onTap: () => _useRecentSearch(search),
+            return Container(
+              margin: EdgeInsets.only(bottom: 12.h),
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: AppColors.border.withOpacity(0.5)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Icon(
+                      Icons.history,
+                      color: AppColors.primary,
+                      size: 16.sp,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          search.location ?? 'Damascus, Kafr Sosa',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: 2.h),
+                        Text(
+                          '${search.checkIn != null ? "Sep ${search.checkIn!.day}" : "Sep 2"} - ${search.checkOut != null ? "Sep ${search.checkOut!.day}" : "Sep 4"}, ${search.guests ?? 2} Guests',
+                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => _removeRecentSearch(index),
+                    child: Icon(
+                      Icons.close,
+                      color: AppColors.error,
+                      size: 20.sp,
+                    ),
+                  ),
+                ],
               ),
             );
           },
@@ -273,13 +424,28 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  void _useRecentSearch(RecentSearch search) {
-    setState(() {
-      _locationController.text = search.location ?? '';
-      _checkIn = search.checkIn;
-      _checkOut = search.checkOut;
-      _guests = search.guests ?? 1;
-    });
+
+  void _openFilterScreen() {
+    final bloc = context.read<SearchBloc>();
+    final currentState = bloc.state;
+    
+    SearchFilter currentFilter = const SearchFilter();
+    
+    if (currentState is LookupsLoaded) {
+      currentFilter = currentState.currentFilter;
+    } else if (currentState is SearchLoaded) {
+      currentFilter = currentState.currentFilter;
+    }
+    
+    Navigator.of(context).pushNamed(
+      '/filter',
+      arguments: {'filter': currentFilter},
+    );
+  }
+
+  void _removeRecentSearch(int index) {
+    // TODO: Implement remove recent search functionality
+    // This would require adding a new event to the bloc
   }
 
   void _onSearchButtonPressed() {
@@ -306,13 +472,9 @@ class _SearchScreenState extends State<SearchScreen> {
       checkOutDate: _checkOut?.millisecondsSinceEpoch,
     );
     
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => BlocProvider.value(
-          value: context.read<SearchBloc>()..add(SearchPropertiesEvent(filter: filter)),
-          child: const SearchResultsScreen(),
-        ),
-      ),
+    Navigator.of(context).pushNamed(
+      '/search-results',
+      arguments: {'filter': filter},
     );
   }
 }

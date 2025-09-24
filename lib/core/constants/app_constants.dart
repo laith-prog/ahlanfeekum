@@ -21,6 +21,14 @@ class AppConstants {
   
   // Search & Properties
   static const String searchPropertyEndpoint = 'properties/search-property';
+  
+  // Property Creation
+  static const String createPropertyStepOne = 'properties/create-step-one';
+  static const String createPropertyStepTwo = 'properties/create-step-two';
+  static const String addAvailability = 'properties/add-availability';
+  static const String uploadSingleMedia = 'properties/upload-one-media';
+  static const String uploadMultipleMedia = 'properties/upload-medias';
+  static const String setPrice = 'properties/set-price';
 
   // Storage Keys
   static const String accessTokenKey = 'access_token';

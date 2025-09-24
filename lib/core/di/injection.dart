@@ -26,6 +26,11 @@ import '../../features/home/data/datasources/home_remote_data_source.dart';
 import '../../features/home/data/repositories/home_repository_impl.dart';
 import '../../features/home/domain/repositories/home_repository.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
+import '../../features/rent_create/data/datasources/rent_create_remote_data_source.dart';
+import '../../features/rent_create/data/repositories/rent_create_repository_impl.dart';
+import '../../features/rent_create/domain/repositories/rent_create_repository.dart';
+import '../../features/rent_create/domain/usecases/create_property_usecase.dart';
+import '../../features/rent_create/presentation/bloc/rent_create_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -60,6 +65,10 @@ Future<void> initializeDependencies() async {
     () => HomeRemoteDataSourceImpl(getIt()),
   );
 
+  getIt.registerLazySingleton<RentCreateRemoteDataSource>(
+    () => RentCreateRemoteDataSourceImpl(getIt()),
+  );
+
   // Repository
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
@@ -81,6 +90,10 @@ Future<void> initializeDependencies() async {
     ),
   );
 
+  getIt.registerLazySingleton<RentCreateRepository>(
+    () => RentCreateRepositoryImpl(getIt()),
+  );
+
   // Use cases
   getIt.registerLazySingleton(() => LoginUseCase(getIt()));
   getIt.registerLazySingleton(() => SendOtpUseCase(getIt()));
@@ -89,6 +102,13 @@ Future<void> initializeDependencies() async {
   getIt.registerLazySingleton(() => ConfirmPasswordResetUseCase(getIt()));
   getIt.registerLazySingleton(() => RegisterUserUseCase(getIt()));
   getIt.registerLazySingleton(() => SendOtpPhoneUseCase(getIt()));
+
+  // Rent Create Use Cases
+  getIt.registerLazySingleton(() => CreatePropertyStepOneUseCase(getIt()));
+  getIt.registerLazySingleton(() => CreatePropertyStepTwoUseCase(getIt()));
+  getIt.registerLazySingleton(() => UploadImagesUseCase(getIt()));
+  getIt.registerLazySingleton(() => SetPriceUseCase(getIt()));
+  getIt.registerLazySingleton(() => AddAvailabilityUseCase(getIt()));
 
   // BLoC
   getIt.registerFactory(
@@ -109,6 +129,14 @@ Future<void> initializeDependencies() async {
 
   getIt.registerFactory(() => HomeBloc(
     homeRepository: getIt(),
+  ));
+
+  getIt.registerFactory(() => RentCreateBloc(
+    createPropertyStepOneUseCase: getIt(),
+    createPropertyStepTwoUseCase: getIt(),
+    uploadImagesUseCase: getIt(),
+    setPriceUseCase: getIt(),
+    addAvailabilityUseCase: getIt(),
   ));
 
   // Registration Cubit

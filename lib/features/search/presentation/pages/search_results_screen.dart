@@ -5,7 +5,7 @@ import '../bloc/search_bloc.dart';
 import '../bloc/search_event.dart';
 import '../bloc/search_state.dart';
 import '../../domain/entities/search_entities.dart';
-import 'filter_screen.dart';
+import '../../data/models/search_filter.dart';
 import '../../../../theming/colors.dart';
 import '../../../../theming/text_styles.dart';
 
@@ -22,11 +22,32 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   @override
   void initState() {
     super.initState();
+    print(
+      '🔍 SearchResultsScreen initState - Current bloc state: ${context.read<SearchBloc>().state.runtimeType}',
+    );
+
     // Load initial search data if not already loaded
     final bloc = context.read<SearchBloc>();
     if (bloc.state is! SearchLoaded && bloc.state is! SearchLoading) {
+      print('🔍 Loading lookups...');
       bloc.add(const LoadLookupsEvent());
     }
+
+    // Trigger search with filter from route arguments or default filter
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      print('🔍 Route arguments: $args');
+
+      final filter = args != null && args['filter'] != null
+          ? args['filter'] as SearchFilter
+          : const SearchFilter(); // Use default filter if none provided
+
+      print('🔍 Using filter: $filter');
+      print('🔍 Triggering search properties event...');
+
+      bloc.add(SearchPropertiesEvent(filter: filter));
+    });
   }
 
   @override
@@ -58,7 +79,11 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64.sp, color: Colors.grey[400]),
+                  Icon(
+                    Icons.error_outline,
+                    size: 64.sp,
+                    color: Colors.grey[400],
+                  ),
                   SizedBox(height: 16.h),
                   Text(
                     'Something went wrong',
@@ -67,12 +92,16 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                   SizedBox(height: 8.h),
                   Text(
                     state.message,
-                    style: AppTextStyles.bodyMedium.copyWith(color: Colors.grey[500]),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.grey[500],
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 16.h),
                   ElevatedButton(
-                    onPressed: () => context.read<SearchBloc>().add(const LoadLookupsEvent()),
+                    onPressed: () => context.read<SearchBloc>().add(
+                      const LoadLookupsEvent(),
+                    ),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -84,7 +113,6 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
             return Column(
               children: [
                 _buildSearchHeader(state),
-                _buildFilterBar(state),
                 Expanded(
                   child: state.properties.isEmpty
                       ? _buildEmptyState()
@@ -95,14 +123,10 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
           }
 
           if (state is LookupsLoaded) {
-            return const Center(
-              child: Text('Start searching to see results'),
-            );
+            return const Center(child: Text('Start searching to see results'));
           }
 
-          return const Center(
-            child: Text('Loading...'),
-          );
+          return const Center(child: Text('Loading...'));
         },
       ),
     );
@@ -111,122 +135,73 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   Widget _buildSearchHeader(SearchLoaded state) {
     return Container(
       padding: EdgeInsets.all(16.w),
-      color: Colors.grey[50],
+      color: Colors.white,
       child: Column(
         children: [
           Row(
             children: [
               Expanded(
                 child: Container(
-                  height: 44.h,
+                  height: 48.h,
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(22.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withValues(alpha: 0.1),
-                        spreadRadius: 1,
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    color: AppColors.inputBackground,
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(color: Colors.transparent),
                   ),
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: 'Search properties...',
+                      hintText: 'Search Something',
+                      hintStyle: AppTextStyles.inputHint,
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                      contentPadding: EdgeInsets.symmetric(vertical: 14.h),
                     ),
                   ),
                 ),
               ),
               SizedBox(width: 12.w),
-              Container(
-                height: 44.h,
-                width: 44.h,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(22.r),
-                ),
-                child: IconButton(
-                  onPressed: () => _openFilterScreen(state),
-                  icon: const Icon(Icons.tune, color: Colors.white),
+              GestureDetector(
+                onTap: () => _openFilterScreen(state),
+                child: Container(
+                  height: 48.h,
+                  width: 48.h,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: const Icon(Icons.tune, color: AppColors.textSecondary),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 16.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${state.properties.length} properties found',
-                style: AppTextStyles.bodyMedium.copyWith(color: Colors.grey[600]),
+                '${state.properties.length} Result Founded',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              Row(
-                children: [
-                  Text(
-                    'Sort by',
-                    style: AppTextStyles.bodySmall.copyWith(color: Colors.grey[600]),
+              GestureDetector(
+                onTap: () => _showSortBottomSheet(),
+                child: Text(
+                  'Sort By',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w500,
                   ),
-                  SizedBox(width: 4.w),
-                  DropdownButton<String>(
-                    value: 'Price',
-                    underline: const SizedBox(),
-                    items: ['Price', 'Rating', 'Distance'].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value, style: AppTextStyles.bodySmall),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      // TODO: Implement sorting
-                    },
-                  ),
-                ],
+                ),
               ),
             ],
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildFilterBar(SearchLoaded state) {
-    return Container(
-      height: 50.h,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          _buildFilterChip('All Properties', true),
-          SizedBox(width: 8.w),
-          _buildFilterChip('Hotels', false),
-          SizedBox(width: 8.w),
-          _buildFilterChip('Apartments', false),
-          SizedBox(width: 8.w),
-          _buildFilterChip('Houses', false),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(String label, bool isSelected) {
-    return FilterChip(
-      label: Text(
-        label,
-        style: AppTextStyles.bodySmall.copyWith(
-          color: isSelected ? Colors.white : Colors.grey[600],
-        ),
-      ),
-      selected: isSelected,
-      onSelected: (bool value) {
-        // TODO: Implement filter selection
-      },
-      backgroundColor: Colors.grey[200],
-      selectedColor: AppColors.primary,
     );
   }
 
@@ -254,8 +229,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            spreadRadius: 1,
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 0,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -310,15 +285,15 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                   top: 8.h,
                   right: 8.w,
                   child: Container(
-                    padding: EdgeInsets.all(4.w),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
+                    padding: EdgeInsets.all(6.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.favorite_border,
-                      color: Colors.grey[600],
-                      size: 16.sp,
+                      color: Colors.grey[700],
+                      size: 18.sp,
                     ),
                   ),
                 ),
@@ -327,21 +302,24 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                     top: 8.h,
                     left: 8.w,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 4.h,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.orange,
-                        borderRadius: BorderRadius.circular(4.r),
+                        borderRadius: BorderRadius.circular(6.r),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.star, color: Colors.white, size: 10.sp),
+                          Icon(Icons.star, color: Colors.white, size: 12.sp),
                           SizedBox(width: 2.w),
                           Text(
                             property.rating.toStringAsFixed(1),
                             style: AppTextStyles.bodySmall.copyWith(
                               color: Colors.white,
-                              fontSize: 8.sp,
+                              fontSize: 10.sp,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -360,46 +338,48 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    property.title,
+                    property.title.length > 30
+                        ? '${property.title.substring(0, 30)}...'
+                        : property.title,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textPrimary,
-                      fontSize: 12.sp,
+                      fontSize: 13.sp,
                       fontWeight: FontWeight.w600,
                     ),
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 2.h),
+                  SizedBox(height: 4.h),
                   Text(
-                    property.address?.isNotEmpty == true 
-                        ? property.address! 
-                        : property.cityName?.isNotEmpty == true 
-                            ? property.cityName! 
-                            : 'Location not specified',
+                    property.address?.isNotEmpty == true
+                        ? property.address!
+                        : property.cityName?.isNotEmpty == true
+                        ? property.cityName!
+                        : 'Damascus Center',
                     style: AppTextStyles.bodySmall.copyWith(
                       color: Colors.grey[600],
-                      fontSize: 10.sp,
+                      fontSize: 11.sp,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const Spacer(),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '\$${property.pricePerNight.toStringAsFixed(0)}',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.primary,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Icon(
+                        Icons.favorite_outline,
+                        color: AppColors.error,
+                        size: 16.sp,
                       ),
-                      Text(
-                        '/night',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: Colors.grey[500],
-                          fontSize: 9.sp,
+                      SizedBox(width: 4.w),
+                      Expanded(
+                        child: Text(
+                          '\$${property.pricePerNight.toStringAsFixed(0)} / Night',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textPrimary,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
@@ -440,11 +420,90 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   }
 
   void _openFilterScreen(SearchLoaded state) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => BlocProvider.value(
-          value: context.read<SearchBloc>(),
-          child: FilterScreen(currentFilter: state.currentFilter),
+    Navigator.of(
+      context,
+    ).pushNamed('/filter', arguments: {'filter': state.currentFilter});
+  }
+
+  void _showSortBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.r),
+              topRight: Radius.circular(20.r),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.all(20.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Sort By',
+                      style: AppTextStyles.h5.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: EdgeInsets.all(8.w),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.grey[600],
+                          size: 20.sp,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildSortOption('Super Hosts', true),
+              _buildSortOption('Lowest Price To Highest', false),
+              _buildSortOption('Highest Price To Lowest', false),
+              SizedBox(height: 20.h),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSortOption(String title, bool isSelected) {
+    return GestureDetector(
+      onTap: () {
+        // TODO: Implement sorting logic
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check, color: AppColors.primary, size: 20.sp),
+          ],
         ),
       ),
     );

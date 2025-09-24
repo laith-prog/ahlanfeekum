@@ -8,7 +8,7 @@ import '../../data/models/search_filter.dart';
 import '../../../../theming/colors.dart';
 import '../../../../theming/text_styles.dart';
 
-enum PropertyType { hotels, apartments, houses }
+enum PropertyType { houses, hotels, motel }
 
 class FilterScreen extends StatefulWidget {
   final SearchFilter currentFilter;
@@ -82,45 +82,46 @@ class _FilterScreenState extends State<FilterScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Filter Properties',
+          'Filter By',
           style: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        actions: [
-          TextButton(
-            onPressed: _clearAllFilters,
-            child: Text(
-              'Clear All',
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary),
-            ),
-          ),
-        ],
+        centerTitle: true,
       ),
+      backgroundColor: Colors.white,
       body: BlocBuilder<SearchBloc, SearchState>(
         builder: (context, state) {
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildPropertyCategorySection(),
-                SizedBox(height: 24.h),
-                _buildPriceRangeSection(),
-                SizedBox(height: 24.h),
-                _buildLocationSection(),
-                SizedBox(height: 24.h),
-                _buildDateSection(),
-                SizedBox(height: 24.h),
-                _buildRoomsBathroomsSection(),
-                SizedBox(height: 24.h),
-                if (state is LookupsLoaded || state is SearchLoaded)
-                  _buildFeaturesSection(state),
-                SizedBox(height: 32.h),
-                _buildFilterButton(),
-              ],
-            ),
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(24.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildPropertyCategorySection(),
+                      SizedBox(height: 24.h),
+                      _buildDateSection(),
+                      SizedBox(height: 24.h),
+                      _buildHotelNameSection(),
+                      SizedBox(height: 24.h),
+                      _buildPriceRangeSection(),
+                      SizedBox(height: 24.h),
+                      _buildLocationSection(),
+                      SizedBox(height: 24.h),
+                      _buildRoomsBathroomsSection(),
+                      SizedBox(height: 24.h),
+                      if (state is LookupsLoaded || state is SearchLoaded)
+                        _buildFeaturesSection(state),
+                      SizedBox(height: 100.h), // Space for button
+                    ],
+                  ),
+                ),
+              ),
+              _buildFilterButton(),
+            ],
           );
         },
       ),
@@ -132,35 +133,54 @@ class _FilterScreenState extends State<FilterScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Property Category',
-          style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
+          'Choose A Category',
+          style: AppTextStyles.h6.copyWith(color: AppColors.textPrimary),
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: 16.h),
         Row(
-          children: PropertyType.values.map((type) {
+          children: PropertyType.values.take(3).map((type) {
             final isSelected = _selectedCategory == type;
             return Expanded(
               child: GestureDetector(
                 onTap: () => setState(() => _selectedCategory = type),
                 child: Container(
                   margin: EdgeInsets.only(
-                    right: type != PropertyType.values.last ? 8.w : 0,
+                    right: type != PropertyType.values.take(3).last ? 12.w : 0,
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 12.h),
+                  padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 12.w),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primary : Colors.grey[100],
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
                       color: isSelected ? AppColors.primary : Colors.grey[300]!,
+                      width: isSelected ? 2.0 : 1.0,
                     ),
                   ),
-                  child: Text(
-                    _getPropertyTypeLabel(type),
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: isSelected ? Colors.white : Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 48.w,
+                        height: 48.h,
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.primary.withOpacity(0.1) : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Icon(
+                          _getPropertyTypeIcon(type),
+                          color: isSelected ? AppColors.primary : Colors.grey[600],
+                          size: 24.sp,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        _getPropertyTypeLabel(type),
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: isSelected ? AppColors.primary : Colors.grey[600],
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -171,13 +191,44 @@ class _FilterScreenState extends State<FilterScreen> {
     );
   }
 
+  Widget _buildHotelNameSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Hotel Name',
+          style: AppTextStyles.h6.copyWith(color: AppColors.textPrimary),
+        ),
+        SizedBox(height: 12.h),
+        TextFormField(
+          controller: _hotelNameController,
+          decoration: InputDecoration(
+            hintText: 'Royal Samirames',
+            hintStyle: AppTextStyles.inputHint,
+            filled: true,
+            fillColor: AppColors.inputBackground,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: AppColors.primary),
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildPriceRangeSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Price Range (per night)',
-          style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
+          'Price Range / Night',
+          style: AppTextStyles.h6.copyWith(color: AppColors.textPrimary),
         ),
         SizedBox(height: 12.h),
         Row(
@@ -187,27 +238,45 @@ class _FilterScreenState extends State<FilterScreen> {
                 controller: _minPriceController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: 'Min Price',
-                  prefixText: '\$ ',
+                  hintText: 'Start From',
+                  hintStyle: AppTextStyles.inputHint,
+                  suffixText: '\$',
+                  suffixStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                  filled: true,
+                  fillColor: AppColors.inputBackground,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
+                    borderSide: BorderSide.none,
                   ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: BorderSide(color: AppColors.primary),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                 ),
               ),
             ),
-            SizedBox(width: 12.w),
-            Text('-', style: AppTextStyles.bodyMedium),
-            SizedBox(width: 12.w),
+            SizedBox(width: 16.w),
             Expanded(
               child: TextFormField(
                 controller: _maxPriceController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: 'Max Price',
-                  prefixText: '\$ ',
+                  hintText: 'To',
+                  hintStyle: AppTextStyles.inputHint,
+                  suffixText: '\$',
+                  suffixStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                  filled: true,
+                  fillColor: AppColors.inputBackground,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
+                    borderSide: BorderSide.none,
                   ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: BorderSide(color: AppColors.primary),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                 ),
               ),
             ),
@@ -223,30 +292,39 @@ class _FilterScreenState extends State<FilterScreen> {
       children: [
         Text(
           'Location',
-          style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
+          style: AppTextStyles.h6.copyWith(color: AppColors.textPrimary),
         ),
         SizedBox(height: 12.h),
         TextFormField(
           controller: _locationController,
           decoration: InputDecoration(
-            labelText: 'Location',
-            hintText: 'Enter city or area',
-            prefixIcon: const Icon(Icons.location_on),
+            hintText: 'Damascus, Kafr Sosa',
+            hintStyle: AppTextStyles.inputHint,
+            suffixIcon: Icon(Icons.location_on_outlined, color: AppColors.primary),
+            filled: true,
+            fillColor: AppColors.inputBackground,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide.none,
             ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: AppColors.primary),
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
           ),
         ),
-        SizedBox(height: 12.h),
-        TextFormField(
-          controller: _hotelNameController,
-          decoration: InputDecoration(
-            labelText: 'Hotel Name (Optional)',
-            hintText: 'Enter hotel name',
-            prefixIcon: const Icon(Icons.hotel),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-            ),
+        SizedBox(height: 16.h),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Text(
+            'The Closest',
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
           ),
         ),
       ],
@@ -309,111 +387,159 @@ class _FilterScreenState extends State<FilterScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Rooms & Bathrooms',
-          style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
+          'Number Of Rooms',
+          style: AppTextStyles.h6.copyWith(color: AppColors.textPrimary),
         ),
         SizedBox(height: 12.h),
-        Row(
-          children: [
-            Expanded(
-              child: _buildCounterSection('Rooms', _selectedRooms, (value) {
-                setState(() => _selectedRooms = value);
-              }),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: _buildCounterSection('Bathrooms', _selectedBathrooms, (value) {
-                setState(() => _selectedBathrooms = value);
-              }),
-            ),
-          ],
+        _buildNumberSelector([1, 2, 3], [
+          '1 - 3',
+          '3 - 6',
+          '6-9',
+          '9+',
+        ], _selectedRooms, (value) => setState(() => _selectedRooms = value)),
+        SizedBox(height: 20.h),
+        Text(
+          'Bathrooms',
+          style: AppTextStyles.h6.copyWith(color: AppColors.textPrimary),
         ),
+        SizedBox(height: 12.h),
+        _buildNumberSelector([1, 2, 3], [
+          '1 - 3',
+          '3 - 5',
+          '+5',
+        ], _selectedBathrooms, (value) => setState(() => _selectedBathrooms = value)),
       ],
     );
   }
 
-  Widget _buildCounterSection(String label, int value, Function(int) onChanged) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: AppTextStyles.bodyMedium.copyWith(color: Colors.grey[600]),
-        ),
-        SizedBox(height: 8.h),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey[300]!),
-            borderRadius: BorderRadius.circular(12.r),
+  Widget _buildNumberSelector(List<int> values, List<String> labels, int selectedValue, Function(int) onChanged) {
+    return Wrap(
+      spacing: 12.w,
+      children: values.asMap().entries.map((entry) {
+        final index = entry.key;
+        final value = entry.value;
+        final isSelected = selectedValue == value;
+        final label = index < labels.length ? labels[index] : value.toString();
+        
+        return GestureDetector(
+          onTap: () => onChanged(value),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: isSelected ? AppColors.primary : Colors.white,
+              borderRadius: BorderRadius.circular(20.r),
+              border: Border.all(
+                color: isSelected ? AppColors.primary : AppColors.border,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isSelected) 
+                  Container(
+                    margin: EdgeInsets.only(right: 6.w),
+                    width: 16.w,
+                    height: 16.h,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.check, color: AppColors.primary, size: 12.sp),
+                  ),
+                Text(
+                  label,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: isSelected ? Colors.white : AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                onPressed: value > 1 ? () => onChanged(value - 1) : null,
-                icon: const Icon(Icons.remove),
-                color: value > 1 ? AppColors.primary : Colors.grey[400],
-              ),
-              Text(
-                value.toString(),
-                style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
-              ),
-              IconButton(
-                onPressed: () => onChanged(value + 1),
-                icon: const Icon(Icons.add),
-                color: AppColors.primary,
-              ),
-            ],
-          ),
-        ),
-      ],
+        );
+      }).toList(),
     );
   }
+
 
   Widget _buildFeaturesSection(dynamic state) {
-    final features = state is LookupsLoaded 
-        ? state.propertyFeatures 
-        : state is SearchLoaded 
-            ? state.propertyFeatures 
-            : <dynamic>[];
-
-    if (features.isEmpty) return const SizedBox.shrink();
+    // Mock features for the design - in real app this would come from state
+    final mockFeatures = [
+      {'id': '1', 'name': 'Solar Energy'},
+      {'id': '2', 'name': 'WIFI'},
+      {'id': '3', 'name': 'Kitchen'},
+      {'id': '4', 'name': 'Amber'},
+      {'id': '5', 'name': 'Hot Water'},
+      {'id': '6', 'name': 'Garden'},
+      {'id': '7', 'name': 'Balcony'},
+      {'id': '8', 'name': 'BBQ Grill'},
+      {'id': '9', 'name': 'Refrigerator'},
+      {'id': '10', 'name': 'Oven'},
+      {'id': '11', 'name': 'TV'},
+      {'id': '12', 'name': 'Washing Machine'},
+      {'id': '13', 'name': 'AC'},
+      {'id': '14', 'name': 'Parking'},
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Property Features',
-          style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
+          'More Features',
+          style: AppTextStyles.h6.copyWith(color: AppColors.textPrimary),
         ),
         SizedBox(height: 12.h),
         Wrap(
           spacing: 8.w,
           runSpacing: 8.h,
-          children: features.map<Widget>((feature) {
-            final featureId = feature.id;
-            final featureName = feature.displayName;
+          children: mockFeatures.map<Widget>((feature) {
+            final featureId = feature['id']!;
+            final featureName = feature['name']!;
             final isSelected = _selectedFeatures.contains(featureId);
             
-            return FilterChip(
-              label: Text(
-                featureName,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: isSelected ? Colors.white : Colors.grey[600],
-                ),
-              ),
-              selected: isSelected,
-              onSelected: (bool selected) {
+            return GestureDetector(
+              onTap: () {
                 setState(() {
-                  if (selected) {
-                    _selectedFeatures.add(featureId);
-                  } else {
+                  if (isSelected) {
                     _selectedFeatures.remove(featureId);
+                  } else {
+                    _selectedFeatures.add(featureId);
                   }
                 });
               },
-              backgroundColor: Colors.grey[200],
-              selectedColor: AppColors.primary,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary : Colors.white,
+                  borderRadius: BorderRadius.circular(20.r),
+                  border: Border.all(
+                    color: isSelected ? AppColors.primary : AppColors.border,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isSelected) 
+                      Container(
+                        margin: EdgeInsets.only(right: 6.w),
+                        width: 14.w,
+                        height: 14.h,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.check, color: AppColors.primary, size: 10.sp),
+                      ),
+                    Text(
+                      featureName,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: isSelected ? Colors.white : AppColors.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             );
           }).toList(),
         ),
@@ -422,41 +548,56 @@ class _FilterScreenState extends State<FilterScreen> {
   }
 
   Widget _buildFilterButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 50.h,
-      child: ElevatedButton(
-        onPressed: () {
-          // Apply filters and navigate back
-          final filter = SearchFilter(
-            propertyTypeId: _getPropertyTypeId(_selectedCategory),
-            checkInDate: _checkIn?.millisecondsSinceEpoch,
-            checkOutDate: _checkOut?.millisecondsSinceEpoch,
-            pricePerNightMin: double.tryParse(_minPriceController.text),
-            pricePerNightMax: double.tryParse(_maxPriceController.text),
-            address: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
-            hotelName: _hotelNameController.text.trim().isEmpty ? null : _hotelNameController.text.trim(),
-            bathroomsMin: _selectedBathrooms,
-            bathroomsMax: _selectedBathrooms + 1,
-            livingroomsMin: _selectedRooms,
-            livingroomsMax: _selectedRooms + 2,
-            selectedFeatures: _selectedFeatures.isEmpty ? null : _selectedFeatures,
-          );
-
-          // Update filter and trigger search
-          context.read<SearchBloc>().add(UpdateFilterEvent(filter: filter));
-          context.read<SearchBloc>().add(SearchPropertiesEvent(filter: filter));
-          Navigator.of(context).pop();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 0,
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
-        ),
-        child: Text(
-          'Apply Filters',
-          style: AppTextStyles.h5.copyWith(color: Colors.white),
+        ],
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: 52.h,
+        child: ElevatedButton(
+          onPressed: () {
+            // Apply filters and navigate back
+            final filter = SearchFilter(
+              propertyTypeId: _getPropertyTypeId(_selectedCategory),
+              checkInDate: _checkIn?.millisecondsSinceEpoch,
+              checkOutDate: _checkOut?.millisecondsSinceEpoch,
+              pricePerNightMin: double.tryParse(_minPriceController.text),
+              pricePerNightMax: double.tryParse(_maxPriceController.text),
+              address: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
+              hotelName: _hotelNameController.text.trim().isEmpty ? null : _hotelNameController.text.trim(),
+              bathroomsMin: _selectedBathrooms,
+              bathroomsMax: _selectedBathrooms + 1,
+              livingroomsMin: _selectedRooms,
+              livingroomsMax: _selectedRooms + 2,
+              selectedFeatures: _selectedFeatures.isEmpty ? null : _selectedFeatures,
+            );
+
+            // Update filter and trigger search
+            context.read<SearchBloc>().add(UpdateFilterEvent(filter: filter));
+            context.read<SearchBloc>().add(SearchPropertiesEvent(filter: filter));
+            Navigator.of(context).pop();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            elevation: 0,
+          ),
+          child: Text(
+            'Filter (23 Result)',
+            style: AppTextStyles.buttonText.copyWith(color: Colors.white),
+          ),
         ),
       ),
     );
@@ -484,40 +625,38 @@ class _FilterScreenState extends State<FilterScreen> {
     }
   }
 
-  void _clearAllFilters() {
-    setState(() {
-      _hotelNameController.clear();
-      _locationController.clear();
-      _minPriceController.clear();
-      _maxPriceController.clear();
-      _selectedCategory = PropertyType.houses;
-      _selectedRooms = 1;
-      _selectedBathrooms = 1;
-      _selectedFeatures.clear();
-      _checkIn = null;
-      _checkOut = null;
-    });
-  }
 
   String _getPropertyTypeLabel(PropertyType type) {
     switch (type) {
-      case PropertyType.hotels:
-        return 'Hotels';
-      case PropertyType.apartments:
-        return 'Apartments';
       case PropertyType.houses:
         return 'Houses';
+      case PropertyType.hotels:
+        return 'Hotels';
+      case PropertyType.motel:
+        return 'Motel';
+    }
+  }
+
+  IconData _getPropertyTypeIcon(PropertyType type) {
+    switch (type) {
+      case PropertyType.houses:
+        return Icons.home_outlined;
+      case PropertyType.hotels:
+        return Icons.hotel_outlined;
+      case PropertyType.motel:
+        return Icons.apartment_outlined;
     }
   }
 
   String? _getPropertyTypeId(PropertyType type) {
     switch (type) {
-      case PropertyType.hotels:
-        return '1';
-      case PropertyType.apartments:
-        return '2';
       case PropertyType.houses:
         return '3';
+      case PropertyType.hotels:
+        return '1';
+      case PropertyType.motel:
+        return '2';
     }
   }
 }
+

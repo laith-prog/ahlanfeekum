@@ -7,6 +7,15 @@ import 'core/di/injection.dart';
 import 'theming/app_theme.dart';
 import 'features/auth/presentation/pages/initial_splash_screen.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/data/datasources/auth_local_data_source.dart';
+import 'features/search/presentation/bloc/search_bloc.dart';
+import 'features/search/presentation/bloc/search_event.dart';
+import 'features/search/presentation/pages/search_screen.dart';
+import 'features/search/presentation/pages/search_results_screen.dart';
+import 'features/search/presentation/pages/filter_screen.dart';
+import 'features/search/data/models/search_filter.dart';
+import 'features/rent_create/presentation/pages/rent_create_flow_screen.dart';
+import 'features/rent_create/presentation/bloc/rent_create_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +26,9 @@ void main() async {
   // Initialize dependencies
   await initializeDependencies();
 
+  // Clear any invalid authentication tokens
+  await _clearInvalidTokens();
+
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ar')],
@@ -25,6 +37,16 @@ void main() async {
       child: const MyApp(),
     ),
   );
+}
+
+// Helper function to clear invalid authentication tokens
+Future<void> _clearInvalidTokens() async {
+  try {
+    final authLocalDataSource = getIt<AuthLocalDataSource>();
+    await authLocalDataSource.clearInvalidTokens();
+  } catch (e) {
+    print('🚨 Error clearing invalid tokens during app initialization: $e');
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -50,9 +72,59 @@ class MyApp extends StatelessWidget {
             supportedLocales: context.supportedLocales,
             locale: context.locale,
             home: const InitialSplashScreen(),
+            onGenerateRoute: AppRouter.onGenerateRoute,
           ),
         );
       },
     );
+  }
+}
+
+class AppRouter {
+  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    debugPrint('Navigating to: ${settings.name}');
+
+    switch (settings.name) {
+      case '/search':
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider(
+            create: (_) => getIt<SearchBloc>(),
+            child: const SearchScreen(),
+          ),
+        );
+
+      case '/search-results':
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider(
+            create: (_) => getIt<SearchBloc>(),
+            child: const SearchResultsScreen(),
+          ),
+        );
+
+      case '/filter':
+        final currentFilter = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider(
+            create: (_) => getIt<SearchBloc>(),
+            child: FilterScreen(
+              currentFilter: currentFilter?['filter'] ?? const SearchFilter(),
+            ),
+          ),
+        );
+
+      case '/rent-create':
+        return MaterialPageRoute(
+          builder: (context) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (_) => getIt<RentCreateBloc>()),
+              BlocProvider(create: (_) => getIt<SearchBloc>()..add(const LoadLookupsEvent())),
+            ],
+            child: const RentCreateFlowScreen(),
+          ),
+        );
+
+      default:
+        return MaterialPageRoute(builder: (_) => const InitialSplashScreen());
+    }
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../../../../core/network/api_result.dart';
 import '../../data/models/search_filter.dart';
+import '../../domain/entities/search_entities.dart';
 import '../../domain/repositories/search_repository.dart';
 import 'search_event.dart';
 import 'search_state.dart';
@@ -14,9 +16,9 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   SearchBloc({
     required SearchRepository searchRepository,
     required SharedPreferences sharedPreferences,
-  })  : _searchRepository = searchRepository,
-        _sharedPreferences = sharedPreferences,
-        super(const SearchInitial()) {
+  }) : _searchRepository = searchRepository,
+       _sharedPreferences = sharedPreferences,
+       super(const SearchInitial()) {
     on<LoadLookupsEvent>(_onLoadLookups);
     on<SearchPropertiesEvent>(_onSearchProperties);
     on<UpdateFilterEvent>(_onUpdateFilter);
@@ -38,33 +40,54 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         _searchRepository.getGovernates(),
       ]);
 
-      final propertyTypesResult = results[0];
-      final propertyFeaturesResult = results[1];
-      final governatesResult = results[2];
+      final propertyTypesResult =
+          results[0] as ApiResult<List<LookupItemEntity>>;
+      final propertyFeaturesResult =
+          results[1] as ApiResult<List<LookupItemEntity>>;
+      final governatesResult = results[2] as ApiResult<List<LookupItemEntity>>;
 
-      propertyTypesResult.when(
-        success: (propertyTypes) {
-          propertyFeaturesResult.when(
-            success: (propertyFeatures) {
-              governatesResult.when(
-                success: (governates) async {
-                  final recentSearches = await _loadRecentSearches();
-                  emit(LookupsLoaded(
-                    propertyTypes: propertyTypes,
-                    propertyFeatures: propertyFeatures,
-                    governates: governates,
-                    currentFilter: const SearchFilter(),
-                    recentSearches: recentSearches,
-                  ));
-                },
-                failure: (message) => emit(SearchError(message: message)),
-              );
-            },
-            failure: (message) => emit(SearchError(message: message)),
-          );
-        },
-        failure: (message) => emit(SearchError(message: message)),
+      // Load recent searches
+      final recentSearches = await _loadRecentSearches();
+
+      final propertyTypes = propertyTypesResult.maybeWhen(
+        success: (data) => data,
+        orElse: () => null,
       );
+      final propertyFeatures = propertyFeaturesResult.maybeWhen(
+        success: (data) => data,
+        orElse: () => null,
+      );
+      final governates = governatesResult.maybeWhen(
+        success: (data) => data,
+        orElse: () => null,
+      );
+
+      if (propertyTypes != null &&
+          propertyFeatures != null &&
+          governates != null) {
+        emit(
+          LookupsLoaded(
+            propertyTypes: propertyTypes,
+            propertyFeatures: propertyFeatures,
+            governates: governates,
+            currentFilter: const SearchFilter(),
+            recentSearches: recentSearches,
+          ),
+        );
+      } else {
+        // Find the failure message
+        final failureMessage = propertyTypesResult.maybeWhen(
+          failure: (message) => message,
+          orElse: () => propertyFeaturesResult.maybeWhen(
+            failure: (message) => message,
+            orElse: () => governatesResult.maybeWhen(
+              failure: (message) => message,
+              orElse: () => 'Unknown error',
+            ),
+          ),
+        );
+        emit(SearchError(message: failureMessage));
+      }
     } catch (error) {
       emit(SearchError(message: 'An unexpected error occurred: $error'));
     }
@@ -86,36 +109,39 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       success: (searchResult) {
         final currentState = state;
         List<RecentSearch> recentSearches = [];
-        
+
         if (currentState is LookupsLoaded) {
           recentSearches = currentState.recentSearches;
         } else if (currentState is SearchLoaded) {
           recentSearches = currentState.recentSearches;
         }
 
-        final lookupsState = currentState is LookupsLoaded 
-            ? currentState 
-            : currentState is SearchLoaded 
-                ? LookupsLoaded(
-                    propertyTypes: currentState.propertyTypes,
-                    propertyFeatures: currentState.propertyFeatures,
-                    governates: currentState.governates,
-                    currentFilter: event.filter,
-                    recentSearches: recentSearches,
-                  )
-                : null;
+        final lookupsState = currentState is LookupsLoaded
+            ? currentState
+            : currentState is SearchLoaded
+            ? LookupsLoaded(
+                propertyTypes: currentState.propertyTypes,
+                propertyFeatures: currentState.propertyFeatures,
+                governates: currentState.governates,
+                currentFilter: event.filter,
+                recentSearches: recentSearches,
+              )
+            : null;
 
         if (lookupsState != null) {
-          emit(SearchLoaded(
-            properties: searchResult.properties,
-            totalCount: searchResult.totalCount,
-            currentFilter: event.filter,
-            propertyTypes: lookupsState.propertyTypes,
-            propertyFeatures: lookupsState.propertyFeatures,
-            governates: lookupsState.governates,
-            recentSearches: recentSearches,
-            hasReachedMax: searchResult.properties.length < event.filter.maxResultCount,
-          ));
+          emit(
+            SearchLoaded(
+              properties: searchResult.properties,
+              totalCount: searchResult.totalCount,
+              currentFilter: event.filter,
+              propertyTypes: lookupsState.propertyTypes,
+              propertyFeatures: lookupsState.propertyFeatures,
+              governates: lookupsState.governates,
+              recentSearches: recentSearches,
+              hasReachedMax:
+                  searchResult.properties.length < event.filter.maxResultCount,
+            ),
+          );
         }
       },
       failure: (message) => emit(SearchError(message: message)),
@@ -128,25 +154,29 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   ) async {
     if (state is LookupsLoaded) {
       final currentState = state as LookupsLoaded;
-      emit(LookupsLoaded(
-        propertyTypes: currentState.propertyTypes,
-        propertyFeatures: currentState.propertyFeatures,
-        governates: currentState.governates,
-        currentFilter: event.filter,
-        recentSearches: currentState.recentSearches,
-      ));
+      emit(
+        LookupsLoaded(
+          propertyTypes: currentState.propertyTypes,
+          propertyFeatures: currentState.propertyFeatures,
+          governates: currentState.governates,
+          currentFilter: event.filter,
+          recentSearches: currentState.recentSearches,
+        ),
+      );
     } else if (state is SearchLoaded) {
       final currentState = state as SearchLoaded;
-      emit(SearchLoaded(
-        properties: currentState.properties,
-        totalCount: currentState.totalCount,
-        currentFilter: event.filter,
-        propertyTypes: currentState.propertyTypes,
-        propertyFeatures: currentState.propertyFeatures,
-        governates: currentState.governates,
-        recentSearches: currentState.recentSearches,
-        hasReachedMax: currentState.hasReachedMax,
-      ));
+      emit(
+        SearchLoaded(
+          properties: currentState.properties,
+          totalCount: currentState.totalCount,
+          currentFilter: event.filter,
+          propertyTypes: currentState.propertyTypes,
+          propertyFeatures: currentState.propertyFeatures,
+          governates: currentState.governates,
+          recentSearches: currentState.recentSearches,
+          hasReachedMax: currentState.hasReachedMax,
+        ),
+      );
     }
   }
 
@@ -156,25 +186,29 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   ) async {
     if (state is LookupsLoaded) {
       final currentState = state as LookupsLoaded;
-      emit(LookupsLoaded(
-        propertyTypes: currentState.propertyTypes,
-        propertyFeatures: currentState.propertyFeatures,
-        governates: currentState.governates,
-        currentFilter: const SearchFilter(),
-        recentSearches: currentState.recentSearches,
-      ));
+      emit(
+        LookupsLoaded(
+          propertyTypes: currentState.propertyTypes,
+          propertyFeatures: currentState.propertyFeatures,
+          governates: currentState.governates,
+          currentFilter: const SearchFilter(),
+          recentSearches: currentState.recentSearches,
+        ),
+      );
     } else if (state is SearchLoaded) {
       final currentState = state as SearchLoaded;
-      emit(SearchLoaded(
-        properties: currentState.properties,
-        totalCount: currentState.totalCount,
-        currentFilter: const SearchFilter(),
-        propertyTypes: currentState.propertyTypes,
-        propertyFeatures: currentState.propertyFeatures,
-        governates: currentState.governates,
-        recentSearches: currentState.recentSearches,
-        hasReachedMax: currentState.hasReachedMax,
-      ));
+      emit(
+        SearchLoaded(
+          properties: currentState.properties,
+          totalCount: currentState.totalCount,
+          currentFilter: const SearchFilter(),
+          propertyTypes: currentState.propertyTypes,
+          propertyFeatures: currentState.propertyFeatures,
+          governates: currentState.governates,
+          recentSearches: currentState.recentSearches,
+          hasReachedMax: currentState.hasReachedMax,
+        ),
+      );
     }
   }
 
@@ -195,18 +229,24 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
     result.when(
       success: (searchResult) {
-        final newProperties = [...currentState.properties, ...searchResult.properties];
-        
-        emit(SearchLoaded(
-          properties: newProperties,
-          totalCount: searchResult.totalCount,
-          currentFilter: currentState.currentFilter,
-          propertyTypes: currentState.propertyTypes,
-          propertyFeatures: currentState.propertyFeatures,
-          governates: currentState.governates,
-          recentSearches: currentState.recentSearches,
-          hasReachedMax: searchResult.properties.length < newFilter.maxResultCount,
-        ));
+        final newProperties = [
+          ...currentState.properties,
+          ...searchResult.properties,
+        ];
+
+        emit(
+          SearchLoaded(
+            properties: newProperties,
+            totalCount: searchResult.totalCount,
+            currentFilter: currentState.currentFilter,
+            propertyTypes: currentState.propertyTypes,
+            propertyFeatures: currentState.propertyFeatures,
+            governates: currentState.governates,
+            recentSearches: currentState.recentSearches,
+            hasReachedMax:
+                searchResult.properties.length < newFilter.maxResultCount,
+          ),
+        );
       },
       failure: (message) {
         // Handle error for load more if needed
@@ -219,7 +259,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     Emitter<SearchState> emit,
   ) async {
     final recentSearches = await _loadRecentSearches();
-    
+
     final newSearch = RecentSearch(
       location: event.location,
       checkIn: event.checkIn,
@@ -231,11 +271,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     // Remove duplicate if exists and add to beginning
     final updatedSearches = [
       newSearch,
-      ...recentSearches.where((search) => 
-          search.location != newSearch.location ||
-          search.checkIn != newSearch.checkIn ||
-          search.checkOut != newSearch.checkOut ||
-          search.guests != newSearch.guests)
+      ...recentSearches.where(
+        (search) =>
+            search.location != newSearch.location ||
+            search.checkIn != newSearch.checkIn ||
+            search.checkOut != newSearch.checkOut ||
+            search.guests != newSearch.guests,
+      ),
     ].take(5).toList(); // Keep only 5 recent searches
 
     await _saveRecentSearches(updatedSearches);
@@ -243,25 +285,29 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     // Update current state with new recent searches
     if (state is LookupsLoaded) {
       final currentState = state as LookupsLoaded;
-      emit(LookupsLoaded(
-        propertyTypes: currentState.propertyTypes,
-        propertyFeatures: currentState.propertyFeatures,
-        governates: currentState.governates,
-        currentFilter: currentState.currentFilter,
-        recentSearches: updatedSearches,
-      ));
+      emit(
+        LookupsLoaded(
+          propertyTypes: currentState.propertyTypes,
+          propertyFeatures: currentState.propertyFeatures,
+          governates: currentState.governates,
+          currentFilter: currentState.currentFilter,
+          recentSearches: updatedSearches,
+        ),
+      );
     } else if (state is SearchLoaded) {
       final currentState = state as SearchLoaded;
-      emit(SearchLoaded(
-        properties: currentState.properties,
-        totalCount: currentState.totalCount,
-        currentFilter: currentState.currentFilter,
-        propertyTypes: currentState.propertyTypes,
-        propertyFeatures: currentState.propertyFeatures,
-        governates: currentState.governates,
-        recentSearches: updatedSearches,
-        hasReachedMax: currentState.hasReachedMax,
-      ));
+      emit(
+        SearchLoaded(
+          properties: currentState.properties,
+          totalCount: currentState.totalCount,
+          currentFilter: currentState.currentFilter,
+          propertyTypes: currentState.propertyTypes,
+          propertyFeatures: currentState.propertyFeatures,
+          governates: currentState.governates,
+          recentSearches: updatedSearches,
+          hasReachedMax: currentState.hasReachedMax,
+        ),
+      );
     }
   }
 
@@ -271,31 +317,42 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
     try {
       final List<dynamic> jsonList = json.decode(jsonString);
-      return jsonList.map((json) => RecentSearch(
-        location: json['location'] as String?,
-        checkIn: json['checkIn'] != null 
-            ? DateTime.tryParse(json['checkIn'] as String)
-            : null,
-        checkOut: json['checkOut'] != null 
-            ? DateTime.tryParse(json['checkOut'] as String)
-            : null,
-        guests: json['guests'] as int?,
-        timestamp: DateTime.parse(json['timestamp'] as String),
-      )).toList();
+      return jsonList
+          .map(
+            (json) => RecentSearch(
+              location: json['location'] as String?,
+              checkIn: json['checkIn'] != null
+                  ? DateTime.tryParse(json['checkIn'] as String)
+                  : null,
+              checkOut: json['checkOut'] != null
+                  ? DateTime.tryParse(json['checkOut'] as String)
+                  : null,
+              guests: json['guests'] as int?,
+              timestamp: DateTime.parse(json['timestamp'] as String),
+            ),
+          )
+          .toList();
     } catch (e) {
       return [];
     }
   }
 
   Future<void> _saveRecentSearches(List<RecentSearch> searches) async {
-    final jsonList = searches.map((search) => {
-      'location': search.location,
-      'checkIn': search.checkIn?.toIso8601String(),
-      'checkOut': search.checkOut?.toIso8601String(),
-      'guests': search.guests,
-      'timestamp': search.timestamp.toIso8601String(),
-    }).toList();
+    final jsonList = searches
+        .map(
+          (search) => {
+            'location': search.location,
+            'checkIn': search.checkIn?.toIso8601String(),
+            'checkOut': search.checkOut?.toIso8601String(),
+            'guests': search.guests,
+            'timestamp': search.timestamp.toIso8601String(),
+          },
+        )
+        .toList();
 
-    await _sharedPreferences.setString(_recentSearchesKey, json.encode(jsonList));
+    await _sharedPreferences.setString(
+      _recentSearchesKey,
+      json.encode(jsonList),
+    );
   }
 }
