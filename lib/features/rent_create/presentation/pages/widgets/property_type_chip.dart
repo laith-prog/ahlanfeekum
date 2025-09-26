@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../../../../../theming/colors.dart';
 import '../../../../../theming/text_styles.dart';
 
-class FeatureChipWidget extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-  final IconData? icon;
-
-  const FeatureChipWidget({
+class PropertyTypeChip extends StatelessWidget {
+  const PropertyTypeChip({
     super.key,
     required this.label,
     required this.isSelected,
     required this.onTap,
-    this.icon,
   });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,7 @@ class FeatureChipWidget extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(18.r),
           border: Border.all(
             color: isSelected

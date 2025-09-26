@@ -5,43 +5,56 @@ part 'property.g.dart';
 @JsonSerializable()
 class Property {
   final String id;
+  @JsonKey(name: 'propertyTitle')
   final String title;
-  final String description;
+  @JsonKey(name: 'streetAndBuildingNumber')
+  final String? description;
   final double pricePerNight;
-  final String address;
+  final String? address;
   final String? cityName;
   final String? governateName;
+  @JsonKey(defaultValue: 1)
   final int bedrooms;
+  @JsonKey(defaultValue: 1)
   final int bathrooms;
+  @JsonKey(defaultValue: 1)
   final int livingrooms;
-  final double rating;
-  final List<String> images;
+  @JsonKey(name: 'averageRating')
+  final double? rating;
+  @JsonKey(name: 'mainImage')
+  final String? mainImage;
+  @JsonKey(defaultValue: <String>[])
   final List<String> features;
+  @JsonKey(defaultValue: '')
   final String propertyTypeId;
   final String? propertyTypeName;
   final String? hotelName;
   final bool isActive;
-  final DateTime? createdDate;
+  final String? landMark;
+  final int? area;
+  final bool? isFavorite;
 
   const Property({
     required this.id,
     required this.title,
-    required this.description,
+    this.description,
     required this.pricePerNight,
-    required this.address,
+    this.address,
     this.cityName,
     this.governateName,
     required this.bedrooms,
     required this.bathrooms,
     required this.livingrooms,
-    required this.rating,
-    required this.images,
+    this.rating,
+    this.mainImage,
     required this.features,
     required this.propertyTypeId,
     this.propertyTypeName,
     this.hotelName,
     required this.isActive,
-    this.createdDate,
+    this.landMark,
+    this.area,
+    this.isFavorite,
   });
 
   factory Property.fromJson(Map<String, dynamic> json) =>

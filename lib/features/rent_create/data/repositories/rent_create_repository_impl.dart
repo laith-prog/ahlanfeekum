@@ -56,6 +56,8 @@ class RentCreateRepositoryImpl implements RentCreateRepository {
         address: formData.address!,
         streetAndBuildingNumber: formData.streetAndBuildingNumber!,
         landMark: formData.landMark!,
+        latitude: (formData.latitude ?? 0).toString(),
+        longitude: (formData.longitude ?? 0).toString(),
       );
 
       final response = await _remoteDataSource.createPropertyStepTwo(request);

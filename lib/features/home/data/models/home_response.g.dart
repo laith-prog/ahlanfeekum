@@ -23,6 +23,13 @@ HomeResponse _$HomeResponseFromJson(Map<String, dynamic> json) => HomeResponse(
           .toList(),
       onlyForYouSectionMobileDto: OnlyForYouSectionDto.fromJson(
           json['onlyForYouSectionMobileDto'] as Map<String, dynamic>),
+      userProfile: json['userProfile'] == null
+          ? null
+          : UserProfileDto.fromJson(
+              json['userProfile'] as Map<String, dynamic>),
+      hotelsOfTheWeek: (json['hotelsOfTheWeek'] as List<dynamic>?)
+          ?.map((e) => HotelOfTheWeekDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$HomeResponseToJson(HomeResponse instance) =>
@@ -32,6 +39,8 @@ Map<String, dynamic> _$HomeResponseToJson(HomeResponse instance) =>
       'highlyRatedProperty': instance.highlyRatedProperty,
       'governorateMobileDto': instance.governorateMobileDto,
       'onlyForYouSectionMobileDto': instance.onlyForYouSectionMobileDto,
+      'userProfile': instance.userProfile,
+      'hotelsOfTheWeek': instance.hotelsOfTheWeek,
     };
 
 SpecialAdvertisementDto _$SpecialAdvertisementDtoFromJson(
@@ -59,6 +68,7 @@ SiteProperty _$SitePropertyFromJson(Map<String, dynamic> json) => SiteProperty(
       address: json['address'] as String?,
       streetAndBuildingNumber: json['streetAndBuildingNumber'] as String?,
       landMark: json['landMark'] as String?,
+      averageRating: (json['averageRating'] as num?)?.toDouble(),
       pricePerNight: (json['pricePerNight'] as num).toDouble(),
       isActive: json['isActive'] as bool,
       isFavorite: json['isFavorite'] as bool,
@@ -73,6 +83,7 @@ Map<String, dynamic> _$SitePropertyToJson(SiteProperty instance) =>
       'address': instance.address,
       'streetAndBuildingNumber': instance.streetAndBuildingNumber,
       'landMark': instance.landMark,
+      'averageRating': instance.averageRating,
       'pricePerNight': instance.pricePerNight,
       'isActive': instance.isActive,
       'isFavorite': instance.isFavorite,
@@ -83,12 +94,14 @@ GovernorateDto _$GovernorateDtoFromJson(Map<String, dynamic> json) =>
     GovernorateDto(
       id: json['id'] as String,
       title: json['title'] as String,
+      icon: json['icon'] as String?,
     );
 
 Map<String, dynamic> _$GovernorateDtoToJson(GovernorateDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
+      'icon': instance.icon,
     };
 
 OnlyForYouSectionDto _$OnlyForYouSectionDtoFromJson(
@@ -107,4 +120,44 @@ Map<String, dynamic> _$OnlyForYouSectionDtoToJson(
       'firstPhoto': instance.firstPhoto,
       'secondPhoto': instance.secondPhoto,
       'thirdPhoto': instance.thirdPhoto,
+    };
+
+UserProfileDto _$UserProfileDtoFromJson(Map<String, dynamic> json) =>
+    UserProfileDto(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      email: json['email'] as String,
+      profilePhoto: json['profilePhoto'] as String?,
+      averageRating: (json['averageRating'] as num?)?.toDouble(),
+      isSuperHost: json['isSuperHost'] as bool,
+    );
+
+Map<String, dynamic> _$UserProfileDtoToJson(UserProfileDto instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'email': instance.email,
+      'profilePhoto': instance.profilePhoto,
+      'averageRating': instance.averageRating,
+      'isSuperHost': instance.isSuperHost,
+    };
+
+HotelOfTheWeekDto _$HotelOfTheWeekDtoFromJson(Map<String, dynamic> json) =>
+    HotelOfTheWeekDto(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      email: json['email'] as String,
+      profilePhoto: json['profilePhoto'] as String?,
+      averageRating: (json['averageRating'] as num?)?.toDouble(),
+      isSuperHost: json['isSuperHost'] as bool,
+    );
+
+Map<String, dynamic> _$HotelOfTheWeekDtoToJson(HotelOfTheWeekDto instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'email': instance.email,
+      'profilePhoto': instance.profilePhoto,
+      'averageRating': instance.averageRating,
+      'isSuperHost': instance.isSuperHost,
     };

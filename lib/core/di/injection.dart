@@ -122,7 +122,7 @@ Future<void> initializeDependencies() async {
     ),
   );
 
-  getIt.registerFactory(() => SearchBloc(
+  getIt.registerLazySingleton(() => SearchBloc(
     searchRepository: getIt(),
     sharedPreferences: getIt(),
   ));

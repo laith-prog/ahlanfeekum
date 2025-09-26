@@ -4,6 +4,8 @@ class HomeData {
   final List<Property> highlyRatedProperties;
   final List<Governorate> governorates;
   final OnlyForYouSection onlyForYouSection;
+  final UserProfile? userProfile;
+  final List<HotelOfTheWeek>? hotelsOfTheWeek;
 
   const HomeData({
     required this.specialAdvertisements,
@@ -11,6 +13,8 @@ class HomeData {
     required this.highlyRatedProperties,
     required this.governorates,
     required this.onlyForYouSection,
+    this.userProfile,
+    this.hotelsOfTheWeek,
   });
 }
 
@@ -39,6 +43,7 @@ class Property {
   final bool isActive;
   final bool isFavorite;
   final String? mainImageUrl;
+  final double? averageRating;
 
   const Property({
     required this.id,
@@ -51,6 +56,7 @@ class Property {
     required this.isActive,
     required this.isFavorite,
     this.mainImageUrl,
+    this.averageRating,
   });
 
   String get displayLocation {
@@ -66,10 +72,12 @@ class Property {
 class Governorate {
   final String id;
   final String title;
+  final String? iconUrl;
 
   const Governorate({
     required this.id,
     required this.title,
+    this.iconUrl,
   });
 }
 
@@ -84,5 +92,41 @@ class OnlyForYouSection {
     required this.firstPhotoUrl,
     required this.secondPhotoUrl,
     required this.thirdPhotoUrl,
+  });
+}
+
+class UserProfile {
+  final String id;
+  final String name;
+  final String email;
+  final String? profilePhotoUrl;
+  final double? averageRating;
+  final bool isSuperHost;
+
+  const UserProfile({
+    required this.id,
+    required this.name,
+    required this.email,
+    this.profilePhotoUrl,
+    this.averageRating,
+    required this.isSuperHost,
+  });
+}
+
+class HotelOfTheWeek {
+  final String id;
+  final String name;
+  final String email;
+  final String? profilePhotoUrl;
+  final double? averageRating;
+  final bool isSuperHost;
+
+  const HotelOfTheWeek({
+    required this.id,
+    required this.name,
+    required this.email,
+    this.profilePhotoUrl,
+    this.averageRating,
+    required this.isSuperHost,
   });
 }

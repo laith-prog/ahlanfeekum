@@ -223,6 +223,10 @@ class UpdateLocationEvent extends RentCreateEvent {
   List<Object?> get props => [latitude, longitude];
 }
 
+class ClearLocationEvent extends RentCreateEvent {
+  const ClearLocationEvent();
+}
+
 // Availability Events
 class UpdateAvailabilityEvent extends RentCreateEvent {
   final DateTime date;

@@ -8,33 +8,34 @@ part of 'property.dart';
 
 Property _$PropertyFromJson(Map<String, dynamic> json) => Property(
       id: json['id'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String,
+      title: json['propertyTitle'] as String,
+      description: json['streetAndBuildingNumber'] as String?,
       pricePerNight: (json['pricePerNight'] as num).toDouble(),
-      address: json['address'] as String,
+      address: json['address'] as String?,
       cityName: json['cityName'] as String?,
       governateName: json['governateName'] as String?,
-      bedrooms: (json['bedrooms'] as num).toInt(),
-      bathrooms: (json['bathrooms'] as num).toInt(),
-      livingrooms: (json['livingrooms'] as num).toInt(),
-      rating: (json['rating'] as num).toDouble(),
-      images:
-          (json['images'] as List<dynamic>).map((e) => e as String).toList(),
-      features:
-          (json['features'] as List<dynamic>).map((e) => e as String).toList(),
-      propertyTypeId: json['propertyTypeId'] as String,
+      bedrooms: (json['bedrooms'] as num?)?.toInt() ?? 1,
+      bathrooms: (json['bathrooms'] as num?)?.toInt() ?? 1,
+      livingrooms: (json['livingrooms'] as num?)?.toInt() ?? 1,
+      rating: (json['averageRating'] as num?)?.toDouble(),
+      mainImage: json['mainImage'] as String?,
+      features: (json['features'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      propertyTypeId: json['propertyTypeId'] as String? ?? '',
       propertyTypeName: json['propertyTypeName'] as String?,
       hotelName: json['hotelName'] as String?,
       isActive: json['isActive'] as bool,
-      createdDate: json['createdDate'] == null
-          ? null
-          : DateTime.parse(json['createdDate'] as String),
+      landMark: json['landMark'] as String?,
+      area: (json['area'] as num?)?.toInt(),
+      isFavorite: json['isFavorite'] as bool?,
     );
 
 Map<String, dynamic> _$PropertyToJson(Property instance) => <String, dynamic>{
       'id': instance.id,
-      'title': instance.title,
-      'description': instance.description,
+      'propertyTitle': instance.title,
+      'streetAndBuildingNumber': instance.description,
       'pricePerNight': instance.pricePerNight,
       'address': instance.address,
       'cityName': instance.cityName,
@@ -42,14 +43,16 @@ Map<String, dynamic> _$PropertyToJson(Property instance) => <String, dynamic>{
       'bedrooms': instance.bedrooms,
       'bathrooms': instance.bathrooms,
       'livingrooms': instance.livingrooms,
-      'rating': instance.rating,
-      'images': instance.images,
+      'averageRating': instance.rating,
+      'mainImage': instance.mainImage,
       'features': instance.features,
       'propertyTypeId': instance.propertyTypeId,
       'propertyTypeName': instance.propertyTypeName,
       'hotelName': instance.hotelName,
       'isActive': instance.isActive,
-      'createdDate': instance.createdDate?.toIso8601String(),
+      'landMark': instance.landMark,
+      'area': instance.area,
+      'isFavorite': instance.isFavorite,
     };
 
 PropertySearchResponse _$PropertySearchResponseFromJson(

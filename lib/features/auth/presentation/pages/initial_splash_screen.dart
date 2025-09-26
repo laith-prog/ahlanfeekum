@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:ahlanfeekum/features/navigation/presentation/pages/main_navigation_screen.dart';
 import 'package:ahlanfeekum/features/auth/presentation/pages/welcome_splash_screen.dart';
 import 'package:ahlanfeekum/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ahlanfeekum/features/auth/presentation/bloc/auth_state.dart';
@@ -44,7 +43,7 @@ class _InitialSplashScreenState extends State<InitialSplashScreen> {
         await Future.delayed(const Duration(seconds: 1));
         if (!mounted) return;
         if (state is AuthAuthenticated) {
-          _goTo(context, const MainNavigationScreen());
+          Navigator.pushReplacementNamed(context, '/main-navigation');
         } else {
           _goTo(context, const WelcomeSplashScreen());
         }

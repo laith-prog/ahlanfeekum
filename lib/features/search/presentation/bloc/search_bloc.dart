@@ -97,10 +97,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     SearchPropertiesEvent event,
     Emitter<SearchState> emit,
   ) async {
-    if (state is! LookupsLoaded && state is! SearchLoaded) {
-      return;
-    }
-
+    print('🔍 SearchBloc: Searching properties with filter');
     emit(const SearchLoading());
 
     final result = await _searchRepository.searchProperties(event.filter);
@@ -109,40 +106,35 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       success: (searchResult) {
         final currentState = state;
         List<RecentSearch> recentSearches = [];
+        List<LookupItemEntity> propertyTypes = [];
+        List<LookupItemEntity> propertyFeatures = [];
+        List<LookupItemEntity> governates = [];
 
         if (currentState is LookupsLoaded) {
           recentSearches = currentState.recentSearches;
+          propertyTypes = currentState.propertyTypes;
+          propertyFeatures = currentState.propertyFeatures;
+          governates = currentState.governates;
         } else if (currentState is SearchLoaded) {
           recentSearches = currentState.recentSearches;
+          propertyTypes = currentState.propertyTypes;
+          propertyFeatures = currentState.propertyFeatures;
+          governates = currentState.governates;
         }
 
-        final lookupsState = currentState is LookupsLoaded
-            ? currentState
-            : currentState is SearchLoaded
-            ? LookupsLoaded(
-                propertyTypes: currentState.propertyTypes,
-                propertyFeatures: currentState.propertyFeatures,
-                governates: currentState.governates,
-                currentFilter: event.filter,
-                recentSearches: recentSearches,
-              )
-            : null;
-
-        if (lookupsState != null) {
-          emit(
-            SearchLoaded(
-              properties: searchResult.properties,
-              totalCount: searchResult.totalCount,
-              currentFilter: event.filter,
-              propertyTypes: lookupsState.propertyTypes,
-              propertyFeatures: lookupsState.propertyFeatures,
-              governates: lookupsState.governates,
-              recentSearches: recentSearches,
-              hasReachedMax:
-                  searchResult.properties.length < event.filter.maxResultCount,
-            ),
-          );
-        }
+        emit(
+          SearchLoaded(
+            properties: searchResult.properties,
+            totalCount: searchResult.totalCount,
+            currentFilter: event.filter,
+            propertyTypes: propertyTypes,
+            propertyFeatures: propertyFeatures,
+            governates: governates,
+            recentSearches: recentSearches,
+            hasReachedMax:
+                searchResult.properties.length < event.filter.maxResultCount,
+          ),
+        );
       },
       failure: (message) => emit(SearchError(message: message)),
     );
@@ -221,11 +213,9 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final currentState = state as SearchLoaded;
     if (currentState.hasReachedMax) return;
 
-    final newFilter = currentState.currentFilter.copyWith(
-      skipCount: currentState.properties.length,
-    );
+    print('🔍 SearchBloc: Loading more properties with skip count: ${event.filter.skipCount}');
 
-    final result = await _searchRepository.searchProperties(newFilter);
+    final result = await _searchRepository.searchProperties(event.filter);
 
     result.when(
       success: (searchResult) {
@@ -244,7 +234,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
             governates: currentState.governates,
             recentSearches: currentState.recentSearches,
             hasReachedMax:
-                searchResult.properties.length < newFilter.maxResultCount,
+                searchResult.properties.length < event.filter.maxResultCount,
           ),
         );
       },

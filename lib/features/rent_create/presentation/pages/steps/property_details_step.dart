@@ -10,6 +10,7 @@ import '../../bloc/rent_create_event.dart';
 import '../../bloc/rent_create_state.dart';
 import '../widgets/counter_widget.dart';
 import '../widgets/feature_chip_widget.dart';
+import '../widgets/property_type_chip.dart';
 
 class PropertyDetailsStep extends StatefulWidget {
   const PropertyDetailsStep({super.key});
@@ -50,23 +51,25 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
               _buildSectionTitle('Property Type'),
               SizedBox(height: 12.h),
               _buildPropertyTypeSelector(),
-              
+
               SizedBox(height: 24.h),
               _buildSectionTitle('Property Title'),
               SizedBox(height: 12.h),
               _buildTextField(
                 controller: _titleController,
-                hintText: 'Enter property title',
+                hintText: '130',
                 onChanged: (value) {
-                  context.read<RentCreateBloc>().add(UpdatePropertyTitleEvent(value));
+                  context.read<RentCreateBloc>().add(
+                    UpdatePropertyTitleEvent(value),
+                  );
                 },
               ),
-              
+
               SizedBox(height: 24.h),
               _buildSectionTitle('Property Details'),
               SizedBox(height: 16.h),
               _buildPropertyCounters(rentState),
-              
+
               SizedBox(height: 24.h),
               _buildSectionTitle('Property Description'),
               SizedBox(height: 12.h),
@@ -75,19 +78,21 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
                 hintText: 'Type Here',
                 maxLines: 4,
                 onChanged: (value) {
-                  context.read<RentCreateBloc>().add(UpdatePropertyDescriptionEvent(value));
+                  context.read<RentCreateBloc>().add(
+                    UpdatePropertyDescriptionEvent(value),
+                  );
                 },
               ),
-              
+
               SizedBox(height: 24.h),
               _buildSectionTitle('More Features'),
               SizedBox(height: 12.h),
               _buildPropertyFeatures(),
-              
+
               SizedBox(height: 24.h),
               _buildSectionTitle('Instructions'),
               SizedBox(height: 16.h),
-              
+
               _buildSubSectionTitle('House Rules'),
               SizedBox(height: 8.h),
               _buildTextField(
@@ -95,10 +100,12 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
                 hintText: 'Type Here',
                 maxLines: 3,
                 onChanged: (value) {
-                  context.read<RentCreateBloc>().add(UpdateHouseRulesEvent(value));
+                  context.read<RentCreateBloc>().add(
+                    UpdateHouseRulesEvent(value),
+                  );
                 },
               ),
-              
+
               SizedBox(height: 16.h),
               _buildSubSectionTitle('Important Information'),
               SizedBox(height: 8.h),
@@ -107,13 +114,15 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
                 hintText: 'Type Here',
                 maxLines: 3,
                 onChanged: (value) {
-                  context.read<RentCreateBloc>().add(UpdateImportantInfoEvent(value));
+                  context.read<RentCreateBloc>().add(
+                    UpdateImportantInfoEvent(value),
+                  );
                 },
               ),
-              
+
               SizedBox(height: 24.h),
               _buildGovernorateSelector(),
-              
+
               SizedBox(height: 100.h), // Space for bottom navigation
             ],
           ),
@@ -150,31 +159,45 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
     int maxLines = 1,
     required Function(String) onChanged,
   }) {
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: AppTextStyles.bodyMedium.copyWith(
-          color: Colors.grey[400],
-          fontSize: 14.sp,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: AppColors.primary, width: 2),
-        ),
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: 16.w,
-          vertical: 12.h,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: AppTextStyles.bodyMedium.copyWith(
+            color: Colors.grey[400],
+            fontSize: 14.sp,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+          ),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 18.w,
+            vertical: maxLines > 1 ? 16.h : 14.h,
+          ),
         ),
       ),
     );
@@ -186,149 +209,96 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
         if (searchState is LookupsLoaded) {
           return BlocBuilder<RentCreateBloc, RentCreateState>(
             builder: (context, rentState) {
-              return Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    value: rentState.formData.propertyTypeId,
-                    hint: Text(
-                      'Select Property Type',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: Colors.grey[400],
-                        fontSize: 14.sp,
-                      ),
-                    ),
-                    items: searchState.propertyTypes.map((type) {
-                      return DropdownMenuItem(
-                        value: type.id,
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(8.w),
-                              decoration: BoxDecoration(
-                                color: type.id == rentState.formData.propertyTypeId
-                                    ? AppColors.primary
-                                    : Colors.grey[200],
-                                borderRadius: BorderRadius.circular(6.r),
-                              ),
-                              child: Icon(
-                                _getPropertyTypeIcon(type.displayName),
-                                color: type.id == rentState.formData.propertyTypeId
-                                    ? Colors.white
-                                    : Colors.grey[600],
-                                size: 20.sp,
-                              ),
-                            ),
-                            SizedBox(width: 12.w),
-                            Text(
-                              type.displayName,
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.textPrimary,
-                                fontSize: 14.sp,
-                              ),
-                            ),
-                          ],
-                        ),
+              return Wrap(
+                spacing: 12.w,
+                runSpacing: 12.h,
+                children: searchState.propertyTypes.map((type) {
+                  final isSelected =
+                      type.id == rentState.formData.propertyTypeId;
+                  return PropertyTypeChip(
+                    label: type.displayName,
+                    isSelected: isSelected,
+                    onTap: () {
+                      context.read<RentCreateBloc>().add(
+                        UpdatePropertyTypeEvent(type.id, type.displayName),
                       );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        final selectedType = searchState.propertyTypes
-                            .firstWhere((type) => type.id == value);
-                        context.read<RentCreateBloc>().add(
-                          UpdatePropertyTypeEvent(value, selectedType.displayName),
-                        );
-                      }
                     },
-                  ),
-                ),
+                  );
+                }).toList(),
               );
             },
           );
         }
-        return const Center(child: CircularProgressIndicator());
+        return SizedBox(
+          height: 48.h,
+          child: const Center(child: CircularProgressIndicator()),
+        );
       },
     );
   }
 
   Widget _buildPropertyCounters(RentCreateState state) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: CounterWidget(
-                title: 'Bedrooms',
-                value: state.formData.bedrooms,
-                onChanged: (value) {
-                  context.read<RentCreateBloc>().add(UpdateBedroomsEvent(value));
-                },
-              ),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: CounterWidget(
-                title: 'Bathrooms',
-                value: state.formData.bathrooms,
-                onChanged: (value) {
-                  context.read<RentCreateBloc>().add(UpdateBathroomsEvent(value));
-                },
-              ),
-            ),
-          ],
+        CounterWidget(
+          title: 'Bedrooms',
+          value: state.formData.bedrooms,
+          minValue: 0,
+          maxValue: 20,
+          onChanged: (value) {
+            context.read<RentCreateBloc>().add(UpdateBedroomsEvent(value));
+          },
         ),
-        SizedBox(height: 16.h),
-        Row(
-          children: [
-            Expanded(
-              child: CounterWidget(
-                title: 'Number Of Beds',
-                value: state.formData.numberOfBeds,
-                onChanged: (value) {
-                  context.read<RentCreateBloc>().add(UpdateNumberOfBedsEvent(value));
-                },
-              ),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: CounterWidget(
-                title: 'Floor',
-                value: state.formData.floor,
-                onChanged: (value) {
-                  context.read<RentCreateBloc>().add(UpdateFloorEvent(value));
-                },
-              ),
-            ),
-          ],
+        SizedBox(height: 20.h),
+        CounterWidget(
+          title: 'Bathrooms',
+          value: state.formData.bathrooms,
+          minValue: 0,
+          maxValue: 20,
+          onChanged: (value) {
+            context.read<RentCreateBloc>().add(UpdateBathroomsEvent(value));
+          },
         ),
-        SizedBox(height: 16.h),
-        Row(
-          children: [
-            Expanded(
-              child: CounterWidget(
-                title: 'Maximum Number Of Guests',
-                value: state.formData.maximumNumberOfGuests,
-                onChanged: (value) {
-                  context.read<RentCreateBloc>().add(UpdateMaxGuestsEvent(value));
-                },
-              ),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: CounterWidget(
-                title: 'Living Rooms',
-                value: state.formData.livingRooms,
-                onChanged: (value) {
-                  context.read<RentCreateBloc>().add(UpdateLivingRoomsEvent(value));
-                },
-              ),
-            ),
-          ],
+        SizedBox(height: 20.h),
+        CounterWidget(
+          title: 'Number Of Beds',
+          value: state.formData.numberOfBeds,
+          minValue: 0,
+          maxValue: 20,
+          onChanged: (value) {
+            context.read<RentCreateBloc>().add(UpdateNumberOfBedsEvent(value));
+          },
+        ),
+        SizedBox(height: 20.h),
+        CounterWidget(
+          title: 'Floor',
+          value: state.formData.floor,
+          minValue: 0,
+          maxValue: 50,
+          onChanged: (value) {
+            context.read<RentCreateBloc>().add(UpdateFloorEvent(value));
+          },
+        ),
+        SizedBox(height: 20.h),
+        CounterWidget(
+          title: 'Maximum Number Of Guests',
+          value: state.formData.maximumNumberOfGuests,
+          minValue: 0,
+          maxValue: 50,
+          onChanged: (value) {
+            context.read<RentCreateBloc>().add(UpdateMaxGuestsEvent(value));
+          },
+        ),
+        SizedBox(height: 20.h),
+        CounterWidget(
+          title: 'Living Rooms',
+          value: state.formData.livingRooms,
+          minValue: 0,
+          maxValue: 20,
+          onChanged: (value) {
+            context.read<RentCreateBloc>().add(UpdateLivingRoomsEvent(value));
+          },
         ),
       ],
     );
@@ -346,7 +316,7 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
                 children: searchState.propertyFeatures.map((feature) {
                   final isSelected = rentState.formData.propertyFeatureIds
                       .contains(feature.id);
-                  
+
                   return FeatureChipWidget(
                     label: feature.displayName,
                     isSelected: isSelected,
@@ -393,15 +363,33 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
               return BlocBuilder<RentCreateBloc, RentCreateState>(
                 builder: (context, rentState) {
                   return Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 18.w,
+                      vertical: 12.h,
+                    ),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey[300]!),
-                      borderRadius: BorderRadius.circular(8.r),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: Colors.grey.withValues(alpha: 0.25),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         isExpanded: true,
                         value: rentState.formData.governorateId,
+                        icon: Icon(
+                          Icons.expand_more,
+                          color: AppColors.primary,
+                          size: 18.sp,
+                        ),
                         hint: Text(
                           'Select Governorate',
                           style: AppTextStyles.bodyMedium.copyWith(
@@ -444,22 +432,5 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
         ),
       ],
     );
-  }
-
-  IconData _getPropertyTypeIcon(String typeName) {
-    switch (typeName.toLowerCase()) {
-      case 'apartment':
-        return Icons.apartment;
-      case 'house':
-        return Icons.house;
-      case 'hotel':
-        return Icons.hotel;
-      case 'motel':
-        return Icons.local_hotel;
-      case 'villa':
-        return Icons.villa;
-      default:
-        return Icons.home;
-    }
   }
 }

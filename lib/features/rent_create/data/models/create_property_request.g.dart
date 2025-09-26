@@ -63,6 +63,8 @@ CreatePropertyStepTwoRequest _$CreatePropertyStepTwoRequestFromJson(
       address: json['address'] as String,
       streetAndBuildingNumber: json['streetAndBuildingNumber'] as String,
       landMark: json['landMark'] as String,
+      latitude: json['latitude'] as String,
+      longitude: json['longitude'] as String,
     );
 
 Map<String, dynamic> _$CreatePropertyStepTwoRequestToJson(
@@ -72,6 +74,8 @@ Map<String, dynamic> _$CreatePropertyStepTwoRequestToJson(
       'address': instance.address,
       'streetAndBuildingNumber': instance.streetAndBuildingNumber,
       'landMark': instance.landMark,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
     };
 
 PropertyAvailability _$PropertyAvailabilityFromJson(

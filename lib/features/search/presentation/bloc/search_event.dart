@@ -35,7 +35,12 @@ class ResetFilterEvent extends SearchEvent {
 }
 
 class LoadMorePropertiesEvent extends SearchEvent {
-  const LoadMorePropertiesEvent();
+  final SearchFilter filter;
+
+  const LoadMorePropertiesEvent({required this.filter});
+
+  @override
+  List<Object?> get props => [filter];
 }
 
 class SaveRecentSearchEvent extends SearchEvent {

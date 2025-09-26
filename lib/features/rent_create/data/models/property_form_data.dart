@@ -1,5 +1,7 @@
 import 'dart:io';
 
+const _unset = Object();
+
 class PropertyFormData {
   // Step 1: Property Details
   String? propertyTitle;
@@ -71,62 +73,102 @@ class PropertyFormData {
   });
 
   PropertyFormData copyWith({
-    String? propertyTitle,
-    String? propertyTypeId,
-    String? propertyTypeName,
-    int? bedrooms,
-    int? bathrooms,
-    int? numberOfBeds,
-    int? floor,
-    int? maximumNumberOfGuests,
-    int? livingRooms,
-    String? propertyDescription,
-    String? houseRules,
-    String? importantInformation,
-    List<String>? propertyFeatureIds,
-    List<String>? selectedFeatures,
-    List<File>? selectedImages,
-    int? primaryImageIndex,
-    int? pricePerNight,
-    String? address,
-    String? streetAndBuildingNumber,
-    String? landMark,
-    String? governorateId,
-    String? governorateName,
-    double? latitude,
-    double? longitude,
-    List<DateTime>? availableDates,
-    Map<DateTime, bool>? dateAvailability,
-    String? propertyId,
+    Object? propertyTitle = _unset,
+    Object? propertyTypeId = _unset,
+    Object? propertyTypeName = _unset,
+    Object? bedrooms = _unset,
+    Object? bathrooms = _unset,
+    Object? numberOfBeds = _unset,
+    Object? floor = _unset,
+    Object? maximumNumberOfGuests = _unset,
+    Object? livingRooms = _unset,
+    Object? propertyDescription = _unset,
+    Object? houseRules = _unset,
+    Object? importantInformation = _unset,
+    Object? propertyFeatureIds = _unset,
+    Object? selectedFeatures = _unset,
+    Object? selectedImages = _unset,
+    Object? primaryImageIndex = _unset,
+    Object? pricePerNight = _unset,
+    Object? address = _unset,
+    Object? streetAndBuildingNumber = _unset,
+    Object? landMark = _unset,
+    Object? governorateId = _unset,
+    Object? governorateName = _unset,
+    Object? latitude = _unset,
+    Object? longitude = _unset,
+    Object? availableDates = _unset,
+    Object? dateAvailability = _unset,
+    Object? propertyId = _unset,
   }) {
     return PropertyFormData(
-      propertyTitle: propertyTitle ?? this.propertyTitle,
-      propertyTypeId: propertyTypeId ?? this.propertyTypeId,
-      propertyTypeName: propertyTypeName ?? this.propertyTypeName,
-      bedrooms: bedrooms ?? this.bedrooms,
-      bathrooms: bathrooms ?? this.bathrooms,
-      numberOfBeds: numberOfBeds ?? this.numberOfBeds,
-      floor: floor ?? this.floor,
-      maximumNumberOfGuests: maximumNumberOfGuests ?? this.maximumNumberOfGuests,
-      livingRooms: livingRooms ?? this.livingRooms,
-      propertyDescription: propertyDescription ?? this.propertyDescription,
-      houseRules: houseRules ?? this.houseRules,
-      importantInformation: importantInformation ?? this.importantInformation,
-      propertyFeatureIds: propertyFeatureIds ?? this.propertyFeatureIds,
-      selectedFeatures: selectedFeatures ?? this.selectedFeatures,
-      selectedImages: selectedImages ?? this.selectedImages,
-      primaryImageIndex: primaryImageIndex ?? this.primaryImageIndex,
-      pricePerNight: pricePerNight ?? this.pricePerNight,
-      address: address ?? this.address,
-      streetAndBuildingNumber: streetAndBuildingNumber ?? this.streetAndBuildingNumber,
-      landMark: landMark ?? this.landMark,
-      governorateId: governorateId ?? this.governorateId,
-      governorateName: governorateName ?? this.governorateName,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
-      availableDates: availableDates ?? this.availableDates,
-      dateAvailability: dateAvailability ?? this.dateAvailability,
-      propertyId: propertyId ?? this.propertyId,
+      propertyTitle: propertyTitle == _unset
+          ? this.propertyTitle
+          : propertyTitle as String?,
+      propertyTypeId: propertyTypeId == _unset
+          ? this.propertyTypeId
+          : propertyTypeId as String?,
+      propertyTypeName: propertyTypeName == _unset
+          ? this.propertyTypeName
+          : propertyTypeName as String?,
+      bedrooms: bedrooms == _unset ? this.bedrooms : bedrooms as int,
+      bathrooms: bathrooms == _unset ? this.bathrooms : bathrooms as int,
+      numberOfBeds: numberOfBeds == _unset
+          ? this.numberOfBeds
+          : numberOfBeds as int,
+      floor: floor == _unset ? this.floor : floor as int,
+      maximumNumberOfGuests: maximumNumberOfGuests == _unset
+          ? this.maximumNumberOfGuests
+          : maximumNumberOfGuests as int,
+      livingRooms: livingRooms == _unset
+          ? this.livingRooms
+          : livingRooms as int,
+      propertyDescription: propertyDescription == _unset
+          ? this.propertyDescription
+          : propertyDescription as String?,
+      houseRules: houseRules == _unset
+          ? this.houseRules
+          : houseRules as String?,
+      importantInformation: importantInformation == _unset
+          ? this.importantInformation
+          : importantInformation as String?,
+      propertyFeatureIds: propertyFeatureIds == _unset
+          ? this.propertyFeatureIds
+          : propertyFeatureIds as List<String>,
+      selectedFeatures: selectedFeatures == _unset
+          ? this.selectedFeatures
+          : selectedFeatures as List<String>,
+      selectedImages: selectedImages == _unset
+          ? this.selectedImages
+          : selectedImages as List<File>,
+      primaryImageIndex: primaryImageIndex == _unset
+          ? this.primaryImageIndex
+          : primaryImageIndex as int?,
+      pricePerNight: pricePerNight == _unset
+          ? this.pricePerNight
+          : pricePerNight as int?,
+      address: address == _unset ? this.address : address as String?,
+      streetAndBuildingNumber: streetAndBuildingNumber == _unset
+          ? this.streetAndBuildingNumber
+          : streetAndBuildingNumber as String?,
+      landMark: landMark == _unset ? this.landMark : landMark as String?,
+      governorateId: governorateId == _unset
+          ? this.governorateId
+          : governorateId as String?,
+      governorateName: governorateName == _unset
+          ? this.governorateName
+          : governorateName as String?,
+      latitude: latitude == _unset ? this.latitude : latitude as double?,
+      longitude: longitude == _unset ? this.longitude : longitude as double?,
+      availableDates: availableDates == _unset
+          ? this.availableDates
+          : availableDates as List<DateTime>,
+      dateAvailability: dateAvailability == _unset
+          ? this.dateAvailability
+          : dateAvailability as Map<DateTime, bool>,
+      propertyId: propertyId == _unset
+          ? this.propertyId
+          : propertyId as String?,
     );
   }
 

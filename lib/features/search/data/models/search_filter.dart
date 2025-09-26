@@ -8,19 +8,27 @@ class SearchFilter {
   final String? propertyTypeId;
   final int? checkInDate;
   final int? checkOutDate;
-  final double? pricePerNightMin;
-  final double? pricePerNightMax;
+  final int? pricePerNightMin;
+  final int? pricePerNightMax;
   final String? address;
+  final int? bedroomsMin;
+  final int? bedroomsMax;
   final int? bathroomsMin;
   final int? bathroomsMax;
+  final int? numberOfBedMin;
+  final int? numberOfBedMax;
+  final String? governorateId;
   final String? hotelName;
+  final int? maximumNumberOfGuestMin;
+  final int? maximumNumberOfGuestMax;
   final int? livingroomsMin;
   final int? livingroomsMax;
+  final double? latitude;
+  final double? longitude;
   final bool? isActive;
   final int skipCount;
   final int maxResultCount;
   final List<String>? selectedFeatures;
-  final String? governateId;
 
   const SearchFilter({
     this.filterText,
@@ -30,16 +38,24 @@ class SearchFilter {
     this.pricePerNightMin,
     this.pricePerNightMax,
     this.address,
+    this.bedroomsMin,
+    this.bedroomsMax,
     this.bathroomsMin,
     this.bathroomsMax,
+    this.numberOfBedMin,
+    this.numberOfBedMax,
+    this.governorateId,
     this.hotelName,
+    this.maximumNumberOfGuestMin,
+    this.maximumNumberOfGuestMax,
     this.livingroomsMin,
     this.livingroomsMax,
+    this.latitude,
+    this.longitude,
     this.isActive = true,
     this.skipCount = 0,
     this.maxResultCount = 20,
     this.selectedFeatures,
-    this.governateId,
   });
 
   factory SearchFilter.fromJson(Map<String, dynamic> json) =>
@@ -52,19 +68,27 @@ class SearchFilter {
     String? propertyTypeId,
     int? checkInDate,
     int? checkOutDate,
-    double? pricePerNightMin,
-    double? pricePerNightMax,
+    int? pricePerNightMin,
+    int? pricePerNightMax,
     String? address,
+    int? bedroomsMin,
+    int? bedroomsMax,
     int? bathroomsMin,
     int? bathroomsMax,
+    int? numberOfBedMin,
+    int? numberOfBedMax,
+    String? governorateId,
     String? hotelName,
+    int? maximumNumberOfGuestMin,
+    int? maximumNumberOfGuestMax,
     int? livingroomsMin,
     int? livingroomsMax,
+    double? latitude,
+    double? longitude,
     bool? isActive,
     int? skipCount,
     int? maxResultCount,
     List<String>? selectedFeatures,
-    String? governateId,
   }) {
     return SearchFilter(
       filterText: filterText ?? this.filterText,
@@ -74,16 +98,24 @@ class SearchFilter {
       pricePerNightMin: pricePerNightMin ?? this.pricePerNightMin,
       pricePerNightMax: pricePerNightMax ?? this.pricePerNightMax,
       address: address ?? this.address,
+      bedroomsMin: bedroomsMin ?? this.bedroomsMin,
+      bedroomsMax: bedroomsMax ?? this.bedroomsMax,
       bathroomsMin: bathroomsMin ?? this.bathroomsMin,
       bathroomsMax: bathroomsMax ?? this.bathroomsMax,
+      numberOfBedMin: numberOfBedMin ?? this.numberOfBedMin,
+      numberOfBedMax: numberOfBedMax ?? this.numberOfBedMax,
+      governorateId: governorateId ?? this.governorateId,
       hotelName: hotelName ?? this.hotelName,
+      maximumNumberOfGuestMin: maximumNumberOfGuestMin ?? this.maximumNumberOfGuestMin,
+      maximumNumberOfGuestMax: maximumNumberOfGuestMax ?? this.maximumNumberOfGuestMax,
       livingroomsMin: livingroomsMin ?? this.livingroomsMin,
       livingroomsMax: livingroomsMax ?? this.livingroomsMax,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       isActive: isActive ?? this.isActive,
       skipCount: skipCount ?? this.skipCount,
       maxResultCount: maxResultCount ?? this.maxResultCount,
       selectedFeatures: selectedFeatures ?? this.selectedFeatures,
-      governateId: governateId ?? this.governateId,
     );
   }
 }

@@ -18,6 +18,9 @@ class SearchResultsScreen extends StatefulWidget {
 
 class _SearchResultsScreenState extends State<SearchResultsScreen> {
   final TextEditingController _searchController = TextEditingController();
+  String _selectedSort = 'Lowest Price';
+  final ScrollController _scrollController = ScrollController();
+  SearchFilter? _currentFilter;
 
   @override
   void initState() {
@@ -26,14 +29,10 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       '🔍 SearchResultsScreen initState - Current bloc state: ${context.read<SearchBloc>().state.runtimeType}',
     );
 
-    // Load initial search data if not already loaded
-    final bloc = context.read<SearchBloc>();
-    if (bloc.state is! SearchLoaded && bloc.state is! SearchLoading) {
-      print('🔍 Loading lookups...');
-      bloc.add(const LoadLookupsEvent());
-    }
+    // Set up pagination scroll listener
+    _scrollController.addListener(_onScroll);
 
-    // Trigger search with filter from route arguments or default filter
+    // Get filter from route arguments and trigger search directly
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final args =
           ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
@@ -43,16 +42,19 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
           ? args['filter'] as SearchFilter
           : const SearchFilter(); // Use default filter if none provided
 
-      print('🔍 Using filter: $filter');
-      print('🔍 Triggering search properties event...');
+      _currentFilter = filter;
+      print('🔍 Using filter: ${filter.toJson()}');
+      print('🔍 Triggering search properties directly...');
 
-      bloc.add(SearchPropertiesEvent(filter: filter));
+      // Always trigger search directly, no need for lookups
+      context.read<SearchBloc>().add(SearchPropertiesEvent(filter: filter));
     });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -61,13 +63,15 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Search Results',
+          'Search Result',
           style: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        centerTitle: true,
       ),
+      backgroundColor: Colors.white,
       body: BlocBuilder<SearchBloc, SearchState>(
         builder: (context, state) {
           if (state is SearchLoading) {
@@ -134,7 +138,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
 
   Widget _buildSearchHeader(SearchLoaded state) {
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       color: Colors.white,
       child: Column(
         children: [
@@ -142,50 +146,94 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
             children: [
               Expanded(
                 child: Container(
-                  height: 48.h,
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
                   decoration: BoxDecoration(
                     color: AppColors.inputBackground,
                     borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(color: Colors.transparent),
+                    border: Border.all(color: AppColors.border.withOpacity(0.3)),
                   ),
-                  child: TextField(
+                  child: TextFormField(
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Search Something',
-                      hintStyle: AppTextStyles.inputHint,
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                      hintStyle: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: AppColors.textSecondary,
+                        size: 20.sp,
+                      ),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 14.h),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 12.h,
+                      ),
                     ),
                   ),
                 ),
               ),
               SizedBox(width: 12.w),
               GestureDetector(
-                onTap: () => _openFilterScreen(state),
+                onTap: () async {
+                  print('🔧 Filter button tapped from search results');
+                  
+                  if (!mounted) {
+                    print('🔧 Widget not mounted');
+                    return;
+                  }
+                  
+                  try {
+                    print('🔧 Navigating to filter with filter: ${state.currentFilter.toJson()}');
+                    
+                    await Navigator.of(context).pushNamed(
+                      '/filter',
+                      arguments: {'filter': state.currentFilter},
+                    );
+                    
+                    print('🔧 Filter navigation completed');
+                  } catch (e) {
+                    print('🚨 Error navigating to filter: $e');
+                    print('🚨 Stack trace: ${StackTrace.current}');
+                    
+                    // Fallback navigation
+                    if (mounted) {
+                      try {
+                        await Navigator.of(context).pushNamed(
+                          '/filter',
+                          arguments: {'filter': const SearchFilter()},
+                        );
+                        print('🔧 Fallback filter navigation completed');
+                      } catch (fallbackError) {
+                        print('🚨 Fallback filter navigation failed: $fallbackError');
+                      }
+                    }
+                  }
+                },
                 child: Container(
-                  height: 48.h,
-                  width: 48.h,
+                  padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(color: AppColors.border),
                   ),
-                  child: const Icon(Icons.tune, color: AppColors.textSecondary),
+                  child: Icon(
+                    Icons.tune,
+                    color: AppColors.textSecondary,
+                    size: 20.sp,
+                  ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 20.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${state.properties.length} Result Founded',
-                style: AppTextStyles.bodyMedium.copyWith(
+                '${state.totalCount} Result Founded',
+                style: AppTextStyles.bodyLarge.copyWith(
                   color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               GestureDetector(
@@ -206,180 +254,185 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   }
 
   Widget _buildPropertyGrid(List<PropertyEntity> properties) {
+    // Sort properties based on selected sort option
+    List<PropertyEntity> sortedProperties = List.from(properties);
+    if (_selectedSort == 'Lowest Price') {
+      sortedProperties.sort((a, b) => a.pricePerNight.compareTo(b.pricePerNight));
+    } else if (_selectedSort == 'Highest Price') {
+      sortedProperties.sort((a, b) => b.pricePerNight.compareTo(a.pricePerNight));
+    }
+    
     return GridView.builder(
+      controller: _scrollController,
       padding: EdgeInsets.all(16.w),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 160.w,
         crossAxisSpacing: 12.w,
-        mainAxisSpacing: 12.h,
-        childAspectRatio: 0.75,
+        mainAxisSpacing: 16.h,
+        childAspectRatio: 160.w / 260.h,
       ),
-      itemCount: properties.length,
+      itemCount: sortedProperties.length,
       itemBuilder: (context, index) {
-        final property = properties[index];
+        final property = sortedProperties[index];
         return _buildPropertyCard(property);
       },
     );
   }
 
   Widget _buildPropertyCard(PropertyEntity property) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 0,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
+    return SizedBox(
+      width: 160.w,
+      height: 260.h,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 3,
+          // Fixed height image container
+          SizedBox(
+            width: 160.w,
+            height: 150.h,
             child: Stack(
               children: [
                 Container(
+                  width: 160.w,
+                  height: 150.h,
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(12.r),
-                      topRight: Radius.circular(12.r),
-                    ),
+                    borderRadius: BorderRadius.circular(16.r),
                   ),
-                  child: property.images.isNotEmpty
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(12.r),
-                            topRight: Radius.circular(12.r),
-                          ),
-                          child: Image.network(
-                            property.images.first,
-                            width: double.infinity,
-                            height: double.infinity,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16.r),
+                    child: property.mainImage != null 
+                        ? Image.network(
+                            _buildFullImageUrl(property.mainImage!),
+                            width: 160.w,
+                            height: 150.h,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              return Center(
+                              return Image.asset(
+                                'assets/images/bulding.jpg',
+                                width: 160.w,
+                                height: 150.h,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 160.w,
+                                    height: 120.h,
+                                    color: Colors.grey[300],
+                                    child: Icon(
+                                      Icons.image_not_supported,
+                                      color: Colors.grey[500],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          )
+                        : Image.asset(
+                            'assets/images/bulding.jpg',
+                            width: 160.w,
+                            height: 120.h,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 160.w,
+                                height: 120.h,
+                                color: Colors.grey[300],
                                 child: Icon(
-                                  Icons.image,
+                                  Icons.image_not_supported,
                                   color: Colors.grey[500],
-                                  size: 40.sp,
                                 ),
                               );
                             },
                           ),
-                        )
-                      : Center(
-                          child: Icon(
-                            Icons.image,
-                            color: Colors.grey[500],
-                            size: 40.sp,
-                          ),
-                        ),
+                  ),
                 ),
                 Positioned(
-                  top: 8.h,
-                  right: 8.w,
+                  top: 12.h,
+                  right: 12.w,
                   child: Container(
                     padding: EdgeInsets.all(6.w),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.9),
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Icon(
                       Icons.favorite_border,
-                      color: Colors.grey[700],
-                      size: 18.sp,
+                      color: AppColors.primary,
+                      size: 16.sp,
                     ),
                   ),
                 ),
-                if (property.rating > 0)
-                  Positioned(
-                    top: 8.h,
-                    left: 8.w,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(6.r),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.star, color: Colors.white, size: 12.sp),
-                          SizedBox(width: 2.w),
-                          Text(
-                            property.rating.toStringAsFixed(1),
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: Colors.white,
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
               ],
             ),
           ),
           Expanded(
-            flex: 2,
             child: Padding(
-              padding: EdgeInsets.all(12.w),
+              padding: EdgeInsets.all(8.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text(
-                    property.title.length > 30
-                        ? '${property.title.substring(0, 30)}...'
-                        : property.title,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textPrimary,
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w600,
+                  // Rating badge between image and title
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                    decoration: BoxDecoration(
+                      color: AppColors.warning,
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    property.address?.isNotEmpty == true
-                        ? property.address!
-                        : property.cityName?.isNotEmpty == true
-                        ? property.cityName!
-                        : 'Damascus Center',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: Colors.grey[600],
-                      fontSize: 11.sp,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.star,
+                          color: Colors.white,
+                          size: 10.sp,
+                        ),
+                        SizedBox(width: 2.w),
+                        Text(
+                          property.rating != null ? property.rating!.toStringAsFixed(1) : '0.0',
+                          style: AppTextStyles.caption.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 10.sp,
+                          ),
+                        ),
+                      ],
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  const Spacer(),
+                  // Title
+                  Flexible(
+                    child: Text(
+                      property.title,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12.sp,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  // Price
                   Row(
                     children: [
-                      Icon(
-                        Icons.favorite_outline,
-                        color: AppColors.error,
-                        size: 16.sp,
+                      Text(
+                        '\$${property.pricePerNight.toStringAsFixed(0)}',
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14.sp,
+                        ),
                       ),
-                      SizedBox(width: 4.w),
-                      Expanded(
-                        child: Text(
-                          '\$${property.pricePerNight.toStringAsFixed(0)} / Night',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.textPrimary,
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      Text(
+                        ' /Night',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textSecondary,
+                          fontSize: 10.sp,
                         ),
                       ),
                     ],
@@ -389,6 +442,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -398,114 +452,152 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off, size: 64.sp, color: Colors.grey[400]),
+          Icon(
+            Icons.search_off,
+            size: 64.sp,
+            color: Colors.grey[400],
+          ),
           SizedBox(height: 16.h),
           Text(
-            'No properties found',
+            'No Results Found',
             style: AppTextStyles.h4.copyWith(color: Colors.grey[600]),
           ),
           SizedBox(height: 8.h),
           Text(
-            'Try adjusting your search criteria',
-            style: AppTextStyles.bodyMedium.copyWith(color: Colors.grey[500]),
-          ),
-          SizedBox(height: 16.h),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Back to Search'),
+            'Try adjusting your search filters',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: Colors.grey[500],
+            ),
           ),
         ],
       ),
     );
   }
 
-  void _openFilterScreen(SearchLoaded state) {
-    Navigator.of(
-      context,
-    ).pushNamed('/filter', arguments: {'filter': state.currentFilter});
-  }
-
   void _showSortBottomSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20.r),
-              topRight: Radius.circular(20.r),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(20.w),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Sort By',
-                      style: AppTextStyles.h5.copyWith(
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: EdgeInsets.all(8.w),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.close,
-                          color: Colors.grey[600],
-                          size: 20.sp,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              _buildSortOption('Super Hosts', true),
-              _buildSortOption('Lowest Price To Highest', false),
-              _buildSortOption('Highest Price To Lowest', false),
-              SizedBox(height: 20.h),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildSortOption(String title, bool isSelected) {
-    return GestureDetector(
-      onTap: () {
-        // TODO: Implement sorting logic
-        Navigator.pop(context);
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-        child: Row(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (context) => Container(
+        padding: EdgeInsets.all(24.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: Text(
-                title,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w500,
-                ),
+            Container(
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: AppColors.border,
+                borderRadius: BorderRadius.circular(2.r),
               ),
             ),
-            if (isSelected)
-              Icon(Icons.check, color: AppColors.primary, size: 20.sp),
+            SizedBox(height: 20.h),
+            Text(
+              'Sort By',
+              style: AppTextStyles.h4.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 24.h),
+            _buildSortOption('Lowest Price'),
+            _buildSortOption('Highest Price'),
+            SizedBox(height: 20.h),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildSortOption(String option) {
+    final isSelected = _selectedSort == option;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedSort = option;
+        });
+        Navigator.pop(context);
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 16.h),
+        child: Row(
+          children: [
+            Container(
+              width: 20.w,
+              height: 20.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? AppColors.green : AppColors.border,
+                  width: 2,
+                ),
+                color: isSelected ? AppColors.green : Colors.transparent,
+              ),
+              child: isSelected
+                  ? Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 12.sp,
+                    )
+                  : null,
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Text(
+                option,
+                style: AppTextStyles.bodyLarge.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      // User reached the end of the list, load more
+      _loadMoreResults();
+    }
+  }
+
+  void _loadMoreResults() async {
+    if (!mounted) return;
+    
+    try {
+      final bloc = context.read<SearchBloc>();
+      if (bloc.isClosed) return;
+      
+      final state = bloc.state;
+      
+      if (state is SearchLoaded && !state.hasReachedMax && _currentFilter != null) {
+        print('🔍 Loading more results...');
+        
+        // Create a new filter with updated skip count for pagination
+        final nextPageFilter = _currentFilter!.copyWith(
+          skipCount: state.properties.length,
+        );
+        
+        // Add event to load more results
+        bloc.add(LoadMorePropertiesEvent(filter: nextPageFilter));
+      }
+    } catch (e) {
+      print('Error loading more results: $e');
+      // Pagination will stop gracefully
+    }
+  }
+
+  String _buildFullImageUrl(String relativePath) {
+    const baseUrl = 'http://srv954186.hstgr.cloud:5000';
+    if (relativePath.startsWith('/')) {
+      return '$baseUrl$relativePath';
+    }
+    return '$baseUrl/$relativePath';
   }
 }

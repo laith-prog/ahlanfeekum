@@ -109,6 +109,14 @@ abstract class SearchRemoteDataSourceHelper {
       queryMap['Address'] = filter.address;
     }
 
+    if (filter.bedroomsMin != null) {
+      queryMap['BedroomsMin'] = filter.bedroomsMin;
+    }
+
+    if (filter.bedroomsMax != null) {
+      queryMap['BedroomsMax'] = filter.bedroomsMax;
+    }
+
     if (filter.bathroomsMin != null) {
       queryMap['BathroomsMin'] = filter.bathroomsMin;
     }
@@ -117,8 +125,28 @@ abstract class SearchRemoteDataSourceHelper {
       queryMap['BathroomsMax'] = filter.bathroomsMax;
     }
 
+    if (filter.numberOfBedMin != null) {
+      queryMap['NumberOfBedMin'] = filter.numberOfBedMin;
+    }
+
+    if (filter.numberOfBedMax != null) {
+      queryMap['NumberOfBedMax'] = filter.numberOfBedMax;
+    }
+
+    if (filter.governorateId != null && filter.governorateId!.isNotEmpty) {
+      queryMap['GovernorateId'] = filter.governorateId;
+    }
+
     if (filter.hotelName != null && filter.hotelName!.isNotEmpty) {
       queryMap['HotelName'] = filter.hotelName;
+    }
+
+    if (filter.maximumNumberOfGuestMin != null) {
+      queryMap['MaximumNumberOfGuestMin'] = filter.maximumNumberOfGuestMin;
+    }
+
+    if (filter.maximumNumberOfGuestMax != null) {
+      queryMap['MaximumNumberOfGuestMax'] = filter.maximumNumberOfGuestMax;
     }
 
     if (filter.livingroomsMin != null) {
@@ -127,6 +155,14 @@ abstract class SearchRemoteDataSourceHelper {
 
     if (filter.livingroomsMax != null) {
       queryMap['LivingroomsMax'] = filter.livingroomsMax;
+    }
+
+    if (filter.latitude != null) {
+      queryMap['Latitude'] = filter.latitude;
+    }
+
+    if (filter.longitude != null) {
+      queryMap['Longitude'] = filter.longitude;
     }
 
     if (filter.isActive != null) {

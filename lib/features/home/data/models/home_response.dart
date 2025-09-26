@@ -9,6 +9,8 @@ class HomeResponse {
   final List<SiteProperty> highlyRatedProperty;
   final List<GovernorateDto> governorateMobileDto;
   final OnlyForYouSectionDto onlyForYouSectionMobileDto;
+  final UserProfileDto? userProfile;
+  final List<HotelOfTheWeekDto>? hotelsOfTheWeek;
 
   const HomeResponse({
     required this.specialAdvertismentMobileDtos,
@@ -16,6 +18,8 @@ class HomeResponse {
     required this.highlyRatedProperty,
     required this.governorateMobileDto,
     required this.onlyForYouSectionMobileDto,
+    this.userProfile,
+    this.hotelsOfTheWeek,
   });
 
   factory HomeResponse.fromJson(Map<String, dynamic> json) =>
@@ -52,6 +56,7 @@ class SiteProperty {
   final String? address;
   final String? streetAndBuildingNumber;
   final String? landMark;
+  final double? averageRating;
   final double pricePerNight;
   final bool isActive;
   final bool isFavorite;
@@ -64,6 +69,7 @@ class SiteProperty {
     this.address,
     this.streetAndBuildingNumber,
     this.landMark,
+    this.averageRating,
     required this.pricePerNight,
     required this.isActive,
     required this.isFavorite,
@@ -80,10 +86,12 @@ class SiteProperty {
 class GovernorateDto {
   final String id;
   final String title;
+  final String? icon;
 
   const GovernorateDto({
     required this.id,
     required this.title,
+    this.icon,
   });
 
   factory GovernorateDto.fromJson(Map<String, dynamic> json) =>
@@ -110,4 +118,52 @@ class OnlyForYouSectionDto {
       _$OnlyForYouSectionDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$OnlyForYouSectionDtoToJson(this);
+}
+
+@JsonSerializable()
+class UserProfileDto {
+  final String id;
+  final String name;
+  final String email;
+  final String? profilePhoto;
+  final double? averageRating;
+  final bool isSuperHost;
+
+  const UserProfileDto({
+    required this.id,
+    required this.name,
+    required this.email,
+    this.profilePhoto,
+    this.averageRating,
+    required this.isSuperHost,
+  });
+
+  factory UserProfileDto.fromJson(Map<String, dynamic> json) =>
+      _$UserProfileDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserProfileDtoToJson(this);
+}
+
+@JsonSerializable()
+class HotelOfTheWeekDto {
+  final String id;
+  final String name;
+  final String email;
+  final String? profilePhoto;
+  final double? averageRating;
+  final bool isSuperHost;
+
+  const HotelOfTheWeekDto({
+    required this.id,
+    required this.name,
+    required this.email,
+    this.profilePhoto,
+    this.averageRating,
+    required this.isSuperHost,
+  });
+
+  factory HotelOfTheWeekDto.fromJson(Map<String, dynamic> json) =>
+      _$HotelOfTheWeekDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$HotelOfTheWeekDtoToJson(this);
 }

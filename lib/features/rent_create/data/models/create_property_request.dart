@@ -58,12 +58,16 @@ class CreatePropertyStepTwoRequest {
   final String address;
   final String streetAndBuildingNumber;
   final String landMark;
+  final String latitude;
+  final String longitude;
 
   const CreatePropertyStepTwoRequest({
     required this.id,
     required this.address,
     required this.streetAndBuildingNumber,
     required this.landMark,
+    required this.latitude,
+    required this.longitude,
   });
 
   factory CreatePropertyStepTwoRequest.fromJson(Map<String, dynamic> json) =>

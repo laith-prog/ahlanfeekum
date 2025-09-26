@@ -10,6 +10,10 @@ class AppColors {
   static const Color secondary = Color(0xFF03DAC6);
   static const Color secondaryLight = Color(0xFF66FFF9);
   static const Color secondaryDark = Color(0xFF00A896);
+  
+  // Green accent color (for mockup matching)
+  static const Color green = Color(0xFF2F8836);
+  static const Color greenLight = Color(0xFF34D399);
 
   // Background Colors
   static const Color background = Color(0xFFFAFAFA);

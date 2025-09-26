@@ -59,9 +59,9 @@ class GovernorateEntity {
 enum PropertyCreationStep {
   propertyDetails(1, 'Property Details'),
   location(2, 'Location'),
-  photos(3, 'Photos'),
-  price(4, 'Price'),
-  availability(5, 'Available In'),
+  availability(3, 'Available In'),
+  photos(4, 'Photos'),
+  price(5, 'Price'),
   review(6, 'Review');
 
   const PropertyCreationStep(this.stepNumber, this.title);

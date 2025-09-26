@@ -83,12 +83,12 @@ class RentCreateState extends Equatable {
         return formData.isStep1Valid;
       case PropertyCreationStep.location:
         return formData.isBothDetailsAndLocationValid;
+      case PropertyCreationStep.availability:
+        return formData.isStep5Valid;
       case PropertyCreationStep.photos:
         return formData.isStep2Valid;
       case PropertyCreationStep.price:
         return formData.isStep3Valid;
-      case PropertyCreationStep.availability:
-        return formData.isStep5Valid;
       case PropertyCreationStep.review:
         return true;
     }

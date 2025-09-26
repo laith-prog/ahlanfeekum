@@ -64,6 +64,7 @@ class HomeRepositoryImpl implements HomeRepository {
           .map((dto) => Governorate(
                 id: dto.id,
                 title: dto.title,
+                iconUrl: dto.icon != null ? _buildFullImageUrl(dto.icon!) : null,
               ))
           .toList();
 
@@ -74,12 +75,27 @@ class HomeRepositoryImpl implements HomeRepository {
         thirdPhotoUrl: _buildFullImageUrl(response.onlyForYouSectionMobileDto.thirdPhoto),
       );
 
+      // Hotels of the week
+      final hotelsOfTheWeek = response.hotelsOfTheWeek
+          ?.map((dto) => HotelOfTheWeek(
+                id: dto.id,
+                name: dto.name,
+                email: dto.email,
+                profilePhotoUrl: dto.profilePhoto != null
+                    ? _buildFullImageUrl(dto.profilePhoto!)
+                    : null,
+                averageRating: dto.averageRating,
+                isSuperHost: dto.isSuperHost,
+              ))
+          .toList();
+
       final homeData = HomeData(
         specialAdvertisements: specialAdvertisements,
         siteProperties: siteProperties,
         highlyRatedProperties: highlyRatedProperties,
         governorates: governorates,
         onlyForYouSection: onlyForYouSection,
+        hotelsOfTheWeek: hotelsOfTheWeek,
       );
 
       print('✅ Home data loaded successfully');

@@ -1,16 +1,16 @@
 class PropertyEntity {
   final String id;
   final String title;
-  final String description;
+  final String? description;
   final double pricePerNight;
-  final String address;
+  final String? address;
   final String? cityName;
   final String? governateName;
   final int bedrooms;
   final int bathrooms;
   final int livingrooms;
-  final double rating;
-  final List<String> images;
+  final double? rating;
+  final String? mainImage;
   final List<String> features;
   final String propertyTypeId;
   final String? propertyTypeName;
@@ -20,16 +20,16 @@ class PropertyEntity {
   const PropertyEntity({
     required this.id,
     required this.title,
-    required this.description,
+    this.description,
     required this.pricePerNight,
-    required this.address,
+    this.address,
     this.cityName,
     this.governateName,
     required this.bedrooms,
     required this.bathrooms,
     required this.livingrooms,
-    required this.rating,
-    required this.images,
+    this.rating,
+    this.mainImage,
     required this.features,
     required this.propertyTypeId,
     this.propertyTypeName,

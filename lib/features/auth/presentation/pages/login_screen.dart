@@ -13,7 +13,6 @@ import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 import 'otp_verification_screen.dart';
-import '../../../navigation/presentation/pages/main_navigation_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -69,9 +68,9 @@ class _LoginScreenState extends State<LoginScreen> {
           if (state is AuthAuthenticated) {
             context.showSnackBar('login_success'.tr());
             // Navigate to home screen and clear all previous routes
-            Navigator.pushAndRemoveUntil(
+            Navigator.pushNamedAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+              '/main-navigation',
               (route) => false,
             );
           } else if (state is AuthError) {

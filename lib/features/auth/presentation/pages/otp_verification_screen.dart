@@ -14,7 +14,6 @@ import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 import 'change_password_screen.dart';
-import '../../../navigation/presentation/pages/main_navigation_screen.dart';
 import 'set_profile_screen.dart';
 import '../cubit/registration_cubit.dart';
 import '../../../../core/di/injection.dart';
@@ -160,9 +159,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               );
             } else if (!widget.isForgotPassword) {
               // Normal login flow - navigate to home and clear all previous routes
-              Navigator.pushAndRemoveUntil(
+              Navigator.pushNamedAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+                '/main-navigation',
                 (route) => false,
               );
             }

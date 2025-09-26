@@ -13,6 +13,7 @@ import 'steps/price_step.dart';
 import 'steps/location_step.dart';
 import 'steps/availability_step.dart';
 import 'steps/review_step.dart';
+import 'widgets/progress_step_indicator.dart';
 
 class RentCreateFlowScreen extends StatefulWidget {
   const RentCreateFlowScreen({super.key});
@@ -34,159 +35,92 @@ class _RentCreateFlowScreenState extends State<RentCreateFlowScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<RentCreateBloc, RentCreateState>(
-        listener: (context, state) {
-          if (state.errorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage!),
-                backgroundColor: Colors.red,
-              ),
+      listener: (context, state) {
+        if (state.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage!),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        if (state.successMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.successMessage!),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+
+        // Auto-navigate to next step when images are uploaded (only this one)
+        if (state.status == RentCreateStatus.imagesUploaded) {
+          final now = DateTime.now();
+          // Prevent rapid multiple navigations
+          if (_lastNavigationTime == null ||
+              now.difference(_lastNavigationTime!).inSeconds > 2) {
+            _lastNavigationTime = now;
+            print(
+              '📱 Images uploaded successfully, navigating to next step...',
             );
-          }
-          if (state.successMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.successMessage!),
-                backgroundColor: Colors.green,
-              ),
+            _pageController.nextPage(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
             );
+          } else {
+            print('📱 Navigation throttled - too soon after last navigation');
           }
-          
-          // Auto-navigate to next step when images are uploaded (only this one)
-          if (state.status == RentCreateStatus.imagesUploaded) {
-            final now = DateTime.now();
-            // Prevent rapid multiple navigations
-            if (_lastNavigationTime == null || 
-                now.difference(_lastNavigationTime!).inSeconds > 2) {
-              _lastNavigationTime = now;
-              print('📱 Images uploaded successfully, navigating to next step...');
-              _pageController.nextPage(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            } else {
-              print('📱 Navigation throttled - too soon after last navigation');
-            }
-          }
-          
-          // Navigate to completion screen when property is submitted
-          if (state.status == RentCreateStatus.propertySubmitted) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const PropertyCreatedSuccessScreen(),
-              ),
-            );
-          }
-        },
-        child: Scaffold(
+        }
+
+        // Navigate to completion screen when property is submitted
+        if (state.status == RentCreateStatus.propertySubmitted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const PropertyCreatedSuccessScreen(),
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
           backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            leading: IconButton(
-              icon: Icon(Icons.close, color: AppColors.textPrimary),
-              onPressed: () => _showExitDialog(context),
-            ),
-            title: Text(
-              'Add Property',
-              style: AppTextStyles.h4.copyWith(
-                color: AppColors.textPrimary,
-                fontSize: 18.sp,
-              ),
-            ),
-            centerTitle: true,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.close, color: AppColors.textPrimary),
+            onPressed: () => _showExitDialog(context),
           ),
-          body: Column(
-            children: [
-              _buildStepIndicator(),
-              Expanded(child: _buildStepContent()),
-              _buildNavigationButtons(),
-            ],
+          title: Text(
+            'Add Property',
+            style: AppTextStyles.h4.copyWith(
+              color: AppColors.textPrimary,
+              fontSize: 18.sp,
+            ),
           ),
+          centerTitle: true,
         ),
+        body: Column(
+          children: [
+            SizedBox(height: 30.h,),
+            _buildStepIndicator(),
+            Expanded(child: _buildStepContent()),
+            SizedBox(height: 80.h), // Space for floating buttons
+          ],
+        ),
+        floatingActionButton: _buildFloatingActionButtons(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      ),
     );
   }
 
   Widget _buildStepIndicator() {
     return BlocBuilder<RentCreateBloc, RentCreateState>(
       builder: (context, state) {
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.1),
-                spreadRadius: 1,
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: state.steps.asMap().entries.map((entry) {
-              final stepStatus = entry.value;
-              final isActive = stepStatus.isActive;
-              final isCompleted = stepStatus.isCompleted;
-
-              return Expanded(
-                child: Column(
-                  children: [
-                    Container(
-                      width: 32.w,
-                      height: 32.h,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isCompleted
-                            ? AppColors.primary
-                            : isActive
-                                ? AppColors.primary.withValues(alpha: 0.2)
-                                : Colors.grey[200],
-                        border: Border.all(
-                          color: isActive || isCompleted
-                              ? AppColors.primary
-                              : Colors.grey[300]!,
-                          width: 2,
-                        ),
-                      ),
-                      child: Center(
-                        child: isCompleted
-                            ? Icon(
-                                Icons.check,
-                                color: Colors.white,
-                                size: 18.sp,
-                              )
-                            : Text(
-                                '${stepStatus.step.stepNumber}',
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: isActive
-                                      ? AppColors.primary
-                                      : Colors.grey[600],
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14.sp,
-                                ),
-                              ),
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      stepStatus.step.title,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: isActive
-                            ? AppColors.primary
-                            : Colors.grey[600],
-                        fontSize: 10.sp,
-                        fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
+        return Column(
+          children: [
+            ProgressStepIndicator(steps: state.steps),
+            SizedBox(height: 12.h),
+          ],
         );
       },
     );
@@ -201,98 +135,77 @@ class _RentCreateFlowScreenState extends State<RentCreateFlowScreen> {
           onPageChanged: (index) {
             context.read<RentCreateBloc>().add(NavigateToStepEvent(index));
           },
-          children: const [
-            PropertyDetailsStep(),
-            LocationStep(),
-            PhotosStep(),
-            PriceStep(),
-            AvailabilityStep(),
-            ReviewStep(),
+          children: [
+            const PropertyDetailsStep(),
+            const LocationStep(),
+            const AvailabilityStep(),
+            const PhotosStep(),
+            const PriceStep(),
+            const ReviewStep(),
           ],
         );
       },
     );
   }
 
-  Widget _buildNavigationButtons() {
+  Widget _buildFloatingActionButtons() {
     return BlocBuilder<RentCreateBloc, RentCreateState>(
       builder: (context, state) {
-        return Container(
-          padding: EdgeInsets.all(20.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.2),
-                spreadRadius: 1,
-                blurRadius: 10,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Previous button (white with arrow)
               if (state.canGoPrevious)
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: state.isLoading ? null : () {
-                      context.read<RentCreateBloc>().add(const PreviousStepEvent());
-                      _pageController.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColors.primary),
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                    ),
-                    child: Text(
-                      'Previous',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.primary,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                FloatingActionButton(
+                  onPressed: state.isLoading
+                      ? null
+                      : () {
+                          context.read<RentCreateBloc>().add(
+                            const PreviousStepEvent(),
+                          );
+                          _pageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                  backgroundColor: Colors.white,
+                  elevation: 4,
+                  heroTag: "previous_btn",
+                  child: Icon(
+                    Icons.arrow_back_ios,
+                    color: AppColors.textPrimary,
+                    size: 20.sp,
                   ),
                 ),
-              if (state.canGoPrevious) SizedBox(width: 16.w),
-              Expanded(
-                flex: state.canGoPrevious ? 1 : 2,
-                child: ElevatedButton(
-                  onPressed: state.canGoNext && !state.isLoading
-                      ? () => _handleNextButton(context, state)
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 14.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: state.isLoading
-                      ? SizedBox(
-                          width: 20.w,
-                          height: 20.h,
-                          child: const CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : Text(
-                          _getButtonText(state),
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: Colors.white,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
+              
+              // Continue button (red with arrow)
+              FloatingActionButton(
+                onPressed: state.canGoNext && !state.isLoading
+                    ? () => _handleNextButton(context, state)
+                    : null,
+                backgroundColor: state.canGoNext && !state.isLoading 
+                    ? AppColors.primary 
+                    : Colors.grey[400],
+                elevation: 4,
+                heroTag: "continue_btn",
+                child: state.isLoading
+                    ? SizedBox(
+                        width: 20.w,
+                        height: 20.h,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
                           ),
                         ),
-                ),
+                      )
+                    : Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white,
+                        size: 20.sp,
+                      ),
               ),
             ],
           ),
@@ -301,30 +214,10 @@ class _RentCreateFlowScreenState extends State<RentCreateFlowScreen> {
     );
   }
 
-  String _getButtonText(RentCreateState state) {
-    if (state.isLastStep) {
-      return 'Submit Property';
-    }
-    
-    switch (state.currentStep) {
-      case PropertyCreationStep.propertyDetails:
-        return 'Continue';
-      case PropertyCreationStep.photos:
-        return 'Continue';
-      case PropertyCreationStep.price:
-        return 'Continue';
-      case PropertyCreationStep.location:
-        return 'Continue';
-      case PropertyCreationStep.availability:
-        return 'Continue';
-      case PropertyCreationStep.review:
-        return 'Submit Property';
-    }
-  }
 
   void _handleNextButton(BuildContext context, RentCreateState state) {
     final bloc = context.read<RentCreateBloc>();
-    
+
     if (state.isLastStep) {
       // Submit the property
       bloc.add(const SubmitPropertyEvent());
@@ -343,20 +236,20 @@ class _RentCreateFlowScreenState extends State<RentCreateFlowScreen> {
           // Create property after both details and location are filled
           bloc.add(const CreatePropertyStepOneEvent());
           break;
+        case PropertyCreationStep.availability:
+          bloc.add(const AddAvailabilityEvent());
+          break;
         case PropertyCreationStep.photos:
           bloc.add(const UploadImagesEvent());
           break;
         case PropertyCreationStep.price:
           bloc.add(const SetPriceEvent());
           break;
-        case PropertyCreationStep.availability:
-          bloc.add(const AddAvailabilityEvent());
-          break;
         case PropertyCreationStep.review:
           bloc.add(const SubmitPropertyEvent());
           break;
       }
-      
+
       // Only navigate to next step if not on the last step
       if (!state.isLastStep) {
         Future.delayed(const Duration(milliseconds: 500), () {
@@ -390,9 +283,7 @@ class _RentCreateFlowScreenState extends State<RentCreateFlowScreen> {
               Navigator.pop(dialogContext);
               Navigator.pop(context);
             },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Exit'),
           ),
         ],
@@ -450,10 +341,9 @@ class PropertyCreatedSuccessScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/main',
-                      (route) => false,
-                    );
+                    Navigator.of(
+                      context,
+                    ).pushNamedAndRemoveUntil('/main', (route) => false);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,

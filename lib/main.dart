@@ -16,6 +16,10 @@ import 'features/search/presentation/pages/filter_screen.dart';
 import 'features/search/data/models/search_filter.dart';
 import 'features/rent_create/presentation/pages/rent_create_flow_screen.dart';
 import 'features/rent_create/presentation/bloc/rent_create_bloc.dart';
+import 'features/navigation/presentation/pages/main_navigation_screen.dart';
+import 'features/home/presentation/pages/home_screen.dart';
+import 'features/home/presentation/bloc/home_bloc.dart';
+import 'features/home/presentation/bloc/home_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,21 +86,22 @@ class MyApp extends StatelessWidget {
 
 class AppRouter {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
-    debugPrint('Navigating to: ${settings.name}');
+    debugPrint('🔧 Navigating to: ${settings.name}');
+    debugPrint('🔧 Route arguments: ${settings.arguments}');
 
     switch (settings.name) {
       case '/search':
         return MaterialPageRoute(
-          builder: (context) => BlocProvider(
-            create: (_) => getIt<SearchBloc>(),
+          builder: (context) => BlocProvider.value(
+            value: getIt<SearchBloc>(),
             child: const SearchScreen(),
           ),
         );
 
       case '/search-results':
         return MaterialPageRoute(
-          builder: (context) => BlocProvider(
-            create: (_) => getIt<SearchBloc>(),
+          builder: (context) => BlocProvider.value(
+            value: getIt<SearchBloc>(),
             child: const SearchResultsScreen(),
           ),
         );
@@ -104,8 +109,8 @@ class AppRouter {
       case '/filter':
         final currentFilter = settings.arguments as Map<String, dynamic>?;
         return MaterialPageRoute(
-          builder: (context) => BlocProvider(
-            create: (_) => getIt<SearchBloc>(),
+          builder: (context) => BlocProvider.value(
+            value: getIt<SearchBloc>(),
             child: FilterScreen(
               currentFilter: currentFilter?['filter'] ?? const SearchFilter(),
             ),
@@ -120,6 +125,25 @@ class AppRouter {
               BlocProvider(create: (_) => getIt<SearchBloc>()..add(const LoadLookupsEvent())),
             ],
             child: const RentCreateFlowScreen(),
+          ),
+        );
+
+      case '/main-navigation':
+        return MaterialPageRoute(
+          builder: (context) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (_) => getIt<HomeBloc>()..add(const LoadHomeDataEvent())),
+              BlocProvider(create: (_) => getIt<SearchBloc>()),
+            ],
+            child: const MainNavigationScreen(),
+          ),
+        );
+
+      case '/home':
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider(
+            create: (_) => getIt<HomeBloc>()..add(const LoadHomeDataEvent()),
+            child: const HomeScreen(),
           ),
         );
 

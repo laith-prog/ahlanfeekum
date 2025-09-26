@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../home/presentation/pages/home_screen.dart';
 import '../../../search/presentation/pages/search_screen.dart';
-import '../../../search/presentation/bloc/search_bloc.dart';
-// Removed direct import - using named route instead
-import '../../../../core/di/injection.dart';
+// BLoCs are now provided by the route in AppRouter
 import '../../../../theming/colors.dart';
 import '../../../../theming/text_styles.dart';
 
@@ -22,10 +19,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _pages = [
     const HomeScreen(),
     const FavoriteScreen(),
-    BlocProvider(
-      create: (context) => getIt<SearchBloc>(),
-      child: const SearchScreen(),
-    ),
+    const SearchScreen(),
     const SettingsScreen(),
   ];
 

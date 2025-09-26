@@ -66,10 +66,14 @@ class SearchRepositoryImpl implements SearchRepository {
   Future<ApiResult<SearchResultEntity>> searchProperties(SearchFilter filter) async {
     try {
       final queryMap = SearchRemoteDataSourceHelper.filterToQueryMap(filter);
-      print('🔍 Searching properties with filter: $queryMap');
+      print('🔍 ===== SEARCH PROPERTIES =====');
+      print('🔍 Original filter: ${filter.toJson()}');
+      print('🔍 Query map for API: $queryMap');
+      print('🔍 GovernorateId in query: ${queryMap['GovernorateId']}');
       
       final response = await _remoteDataSource.searchProperties(queryMap);
-      print('✅ Search response: ${response.items.length} properties found');
+      print('✅ Search API response: ${response.items.length} properties found');
+      print('✅ Total count from API: ${response.totalCount}');
       
       final entities = response.items
           .map((property) => PropertyEntity(
@@ -84,7 +88,7 @@ class SearchRepositoryImpl implements SearchRepository {
                 bathrooms: property.bathrooms,
                 livingrooms: property.livingrooms,
                 rating: property.rating,
-                images: property.images,
+                mainImage: property.mainImage,
                 features: property.features,
                 propertyTypeId: property.propertyTypeId,
                 propertyTypeName: property.propertyTypeName,

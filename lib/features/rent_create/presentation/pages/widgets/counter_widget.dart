@@ -33,21 +33,16 @@ class CounterWidget extends StatelessWidget {
           ),
         ),
         SizedBox(height: 8.h),
-        Row(
-          children: [
-            _buildCounterButton(
-              icon: Icons.remove,
-              onTap: value > minValue ? () => onChanged(value - 1) : null,
-            ),
-            SizedBox(width: 12.w),
-            Container(
-              width: 40.w,
-              height: 40.h,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey[300]!),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Center(
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 14.h),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9F9F9),
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.18)),
+          ),
+          child: Row(
+            children: [
+              Expanded(
                 child: Text(
                   value.toString(),
                   style: AppTextStyles.bodyMedium.copyWith(
@@ -57,40 +52,46 @@ class CounterWidget extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
-            SizedBox(width: 12.w),
-            _buildCounterButton(
-              icon: Icons.add,
-              onTap: value < maxValue ? () => onChanged(value + 1) : null,
-            ),
-          ],
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildArrowButton(
+                    icon: Icons.expand_more,
+                    onTap: value > minValue ? () => onChanged(value - 1) : null,
+                  ),
+                  SizedBox(width: 12.w),
+                  _buildArrowButton(
+                    icon: Icons.expand_less,
+                    onTap: value < maxValue ? () => onChanged(value + 1) : null,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildCounterButton({
+  Widget _buildArrowButton({
     required IconData icon,
     required VoidCallback? onTap,
   }) {
     final isEnabled = onTap != null;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 40.w,
-        height: 40.h,
+        width: 32.w,
+        height: 32.h,
         decoration: BoxDecoration(
-          color: isEnabled ? AppColors.primary : Colors.grey[200],
-          borderRadius: BorderRadius.circular(8.r),
-          border: Border.all(
-            color: isEnabled ? AppColors.primary : Colors.grey[300]!,
-          ),
+          color: AppColors.primary.withValues(alpha: isEnabled ? 0.12 : 0.06),
+          borderRadius: BorderRadius.circular(10.r),
         ),
         child: Icon(
           icon,
-          color: isEnabled ? Colors.white : Colors.grey[400],
-          size: 20.sp,
+          color: isEnabled ? AppColors.primary : Colors.grey[400],
+          size: 18.sp,
         ),
       ),
     );

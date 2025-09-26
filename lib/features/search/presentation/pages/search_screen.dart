@@ -24,8 +24,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    // Load lookups when screen opens
-    context.read<SearchBloc>().add(const LoadLookupsEvent());
+    // Don't load lookups automatically - only when needed
   }
 
   @override
@@ -58,7 +57,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSearchCard(),
+                      _buildSearchForm(),
                       SizedBox(height: 32.h),
                       if (state is LookupsLoaded && state.recentSearches.isNotEmpty)
                         _buildRecentSearches(state.recentSearches),
@@ -74,101 +73,93 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildSearchCard() {
-    return Container(
-      padding: EdgeInsets.all(24.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 0,
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLocationField(),
-          SizedBox(height: 20.h),
-          _buildDateSection(),
-          SizedBox(height: 20.h),
-          _buildGuestsSection(),
-          SizedBox(height: 24.h),
-          Row(
-            children: [
-              Expanded(child: SizedBox()),
-              _buildFilterButton(),
-            ],
-          ),
-        ],
-      ),
+  Widget _buildSearchForm() {
+    return Column(
+      children: [
+        _buildLocationField(),
+        SizedBox(height: 16.h),
+        _buildDateSection(),
+        SizedBox(height: 16.h),
+        _buildGuestsField(),
+        SizedBox(height: 20.h),
+        _buildFilterButton(),
+      ],
     );
   }
 
   Widget _buildLocationField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextFormField(
-          controller: _locationController,
-          decoration: InputDecoration(
-            labelText: 'Where To?',
-            labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-            hintText: 'Enter destination',
-            hintStyle: AppTextStyles.inputHint,
-            prefixIcon: Icon(Icons.location_on_outlined, color: AppColors.primary),
-            filled: true,
-            fillColor: AppColors.inputBackground,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: AppColors.primary),
-            ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.inputBackground,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: AppColors.border.withOpacity(0.3)),
+      ),
+      child: TextFormField(
+        controller: _locationController,
+        decoration: InputDecoration(
+          hintText: 'Where To?',
+          hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+          prefixIcon: Icon(
+            Icons.location_on_outlined,
+            color: AppColors.green,
+            size: 20.sp,
           ),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
         ),
-      ],
+      ),
     );
   }
 
   Widget _buildDateSection() {
     return Row(
       children: [
-        Expanded(child: _buildDateField('Check In', _checkIn, true)),
-        SizedBox(width: 16.w),
-        Expanded(child: _buildDateField('Check Out', _checkOut, false)),
+        Expanded(
+          child: _buildDateField(
+            'Check In',
+            _checkIn,
+            () => _selectDate(true),
+          ),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: _buildDateField(
+            'Check Out',
+            _checkOut,
+            () => _selectDate(false),
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildDateField(String label, DateTime? date, bool isCheckIn) {
+  Widget _buildDateField(String label, DateTime? date, VoidCallback onTap) {
     return GestureDetector(
-      onTap: () => _selectDate(isCheckIn),
+      onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: AppColors.inputBackground,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.transparent),
+          border: Border.all(color: AppColors.border.withOpacity(0.3)),
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_today_outlined, color: AppColors.primary, size: 20.sp),
-            SizedBox(width: 12.w),
+            Icon(
+              Icons.calendar_today_outlined,
+              color: AppColors.green,
+              size: 18.sp,
+            ),
+            SizedBox(width: 8.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     label,
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   SizedBox(height: 2.h),
                   Text(
@@ -177,7 +168,6 @@ class _SearchScreenState extends State<SearchScreen> {
                         : '1/Sep/2024',
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -189,97 +179,60 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildGuestsSection() {
+  Widget _buildGuestsField() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       decoration: BoxDecoration(
         color: AppColors.inputBackground,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.transparent),
+        border: Border.all(color: AppColors.border.withOpacity(0.3)),
       ),
-      child: Row(
-        children: [
-          Icon(Icons.person_outline, color: AppColors.primary, size: 20.sp),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Guests',
-                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                ),
-                SizedBox(height: 2.h),
-                Text(
-                  '$_guests Guests',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+      child: TextFormField(
+        readOnly: true,
+        decoration: InputDecoration(
+          hintText: '$_guests Guest${_guests > 1 ? 's' : ''}',
+          hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
+          prefixIcon: Icon(
+            Icons.person_outline,
+            color: AppColors.green,
+            size: 20.sp,
           ),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: _guests > 1 ? () => setState(() => _guests--) : null,
-                child: Container(
-                  padding: EdgeInsets.all(4.w),
-                  decoration: BoxDecoration(
-                    color: _guests > 1 ? AppColors.primary.withOpacity(0.1) : Colors.grey[200],
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.remove,
-                    color: _guests > 1 ? AppColors.primary : Colors.grey[400],
-                    size: 16.sp,
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              GestureDetector(
-                onTap: () => setState(() => _guests++),
-                child: Container(
-                  padding: EdgeInsets.all(4.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.add,
-                    color: AppColors.primary,
-                    size: 16.sp,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        ),
+        onTap: () => _showGuestSelector(),
       ),
     );
   }
 
   Widget _buildFilterButton() {
-    return GestureDetector(
-      onTap: _openFilterScreen,
-      child: Container(
-        padding: EdgeInsets.all(12.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.tune, color: AppColors.textSecondary, size: 20.sp),
-            SizedBox(width: 4.w),
-            Text(
-              'Filter',
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-            ),
-          ],
+    return Align(
+      alignment: Alignment.centerRight,
+      child: GestureDetector(
+        onTap: _openFilterScreen,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.tune,
+                color: AppColors.textSecondary,
+                size: 20.sp,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                'Filter',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -333,72 +286,82 @@ class _SearchScreenState extends State<SearchScreen> {
       children: [
         Text(
           'Recent Search',
-          style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
+          style: AppTextStyles.h4.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         SizedBox(height: 16.h),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: recentSearches.length.clamp(0, 3), // Limit to 3 recent searches
-          itemBuilder: (context, index) {
-            final search = recentSearches[index];
-            return Container(
-              margin: EdgeInsets.only(bottom: 12.h),
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: AppColors.border.withOpacity(0.5)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Icon(
-                      Icons.history,
-                      color: AppColors.primary,
-                      size: 16.sp,
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          search.location ?? 'Damascus, Kafr Sosa',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(height: 2.h),
-                        Text(
-                          '${search.checkIn != null ? "Sep ${search.checkIn!.day}" : "Sep 2"} - ${search.checkOut != null ? "Sep ${search.checkOut!.day}" : "Sep 4"}, ${search.guests ?? 2} Guests',
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => _removeRecentSearch(index),
-                    child: Icon(
-                      Icons.close,
-                      color: AppColors.error,
-                      size: 20.sp,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+        ...recentSearches.take(3).map((search) => _buildRecentSearchItem(search)).toList(),
       ],
     );
+  }
+
+  Widget _buildRecentSearchItem(RecentSearch search) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      child: Row(
+        children: [
+          Icon(
+            Icons.history,
+            color: AppColors.textSecondary,
+            size: 20.sp,
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _formatRecentSearchTitle(search),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  _formatRecentSearchSubtitle(search),
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () => _removeRecentSearch(search),
+            child: Icon(
+              Icons.close,
+              color: AppColors.primary,
+              size: 18.sp,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatRecentSearchTitle(RecentSearch search) {
+    if (search.location != null && search.location!.isNotEmpty) {
+      return search.location!;
+    }
+    return 'Search';
+  }
+
+  String _formatRecentSearchSubtitle(RecentSearch search) {
+    List<String> parts = [];
+    
+    if (search.checkIn != null && search.checkOut != null) {
+      final checkInStr = '${search.checkIn!.day}/${search.checkIn!.month}/${search.checkIn!.year}';
+      final checkOutStr = '${search.checkOut!.day}/${search.checkOut!.month}/${search.checkOut!.year}';
+      parts.add('$checkInStr - $checkOutStr');
+    }
+    
+    if (search.guests != null && search.guests! > 0) {
+      parts.add('${search.guests} Guest${search.guests! > 1 ? 's' : ''}');
+    }
+    
+    return parts.join(', ');
   }
 
   Future<void> _selectDate(bool isCheckIn) async {
@@ -424,26 +387,171 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-
-  void _openFilterScreen() {
-    final bloc = context.read<SearchBloc>();
-    final currentState = bloc.state;
-    
-    SearchFilter currentFilter = const SearchFilter();
-    
-    if (currentState is LookupsLoaded) {
-      currentFilter = currentState.currentFilter;
-    } else if (currentState is SearchLoaded) {
-      currentFilter = currentState.currentFilter;
-    }
-    
-    Navigator.of(context).pushNamed(
-      '/filter',
-      arguments: {'filter': currentFilter},
+  Future<void> _showGuestSelector() async {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (context) => Container(
+        padding: EdgeInsets.all(24.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: AppColors.border,
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+            SizedBox(height: 20.h),
+            Text(
+              'Guests',
+              style: AppTextStyles.h4.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 24.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Number of Guests',
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        if (_guests > 1) {
+                          setState(() => _guests = _guests - 1);
+                        }
+                      },
+                      child: Container(
+                        width: 40.w,
+                        height: 40.w,
+                        decoration: BoxDecoration(
+                          color: _guests > 1 ? AppColors.primary : AppColors.border,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Icon(
+                          Icons.remove,
+                          color: _guests > 1 ? Colors.white : AppColors.textSecondary,
+                          size: 20.sp,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 60.w,
+                      child: Text(
+                        '$_guests',
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.h4.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        if (_guests < 10) {
+                          setState(() => _guests = _guests + 1);
+                        }
+                      },
+                      child: Container(
+                        width: 40.w,
+                        height: 40.w,
+                        decoration: BoxDecoration(
+                          color: _guests < 10 ? AppColors.primary : AppColors.border,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Icon(
+                          Icons.add,
+                          color: _guests < 10 ? Colors.white : AppColors.textSecondary,
+                          size: 20.sp,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 32.h),
+          ],
+        ),
+      ),
     );
   }
 
-  void _removeRecentSearch(int index) {
+  void _openFilterScreen() async {
+    print('🔧 _openFilterScreen called');
+    
+    if (!mounted) {
+      print('🔧 Widget not mounted, returning');
+      return;
+    }
+    
+    try {
+      final bloc = context.read<SearchBloc>();
+      print('🔧 SearchBloc obtained, isClosed: ${bloc.isClosed}');
+      
+      if (bloc.isClosed) {
+        print('🔧 BLoC is closed, returning');
+        return;
+      }
+      
+      final currentState = bloc.state;
+      print('🔧 Current BLoC state: ${currentState.runtimeType}');
+      
+      SearchFilter currentFilter = const SearchFilter();
+      
+      // Extract current filter from state
+      if (currentState is LookupsLoaded) {
+        currentFilter = currentState.currentFilter;
+        print('🔧 Using filter from LookupsLoaded state');
+      } else if (currentState is SearchLoaded) {
+        currentFilter = currentState.currentFilter;
+        print('🔧 Using filter from SearchLoaded state');
+      } else {
+        print('🔧 Using default filter');
+      }
+      
+      print('🔧 Navigating to filter screen with filter: ${currentFilter.toJson()}');
+      
+      // Navigate immediately
+      if (mounted) {
+        await Navigator.of(context).pushNamed(
+          '/filter',
+          arguments: {'filter': currentFilter},
+        );
+        print('🔧 Navigation completed successfully');
+      }
+    } catch (e) {
+      print('🚨 Error opening filter screen: $e');
+      print('🚨 Stack trace: ${StackTrace.current}');
+      
+      // Fallback: navigate with default filter
+      if (mounted) {
+        try {
+          await Navigator.of(context).pushNamed(
+            '/filter',
+            arguments: {'filter': const SearchFilter()},
+          );
+          print('🔧 Fallback navigation completed');
+        } catch (fallbackError) {
+          print('🚨 Fallback navigation also failed: $fallbackError');
+        }
+      }
+    }
+  }
+
+  void _removeRecentSearch(RecentSearch search) {
     // TODO: Implement remove recent search functionality
     // This would require adding a new event to the bloc
   }
@@ -467,11 +575,17 @@ class _SearchScreenState extends State<SearchScreen> {
 
     // Create search filter and navigate to results
     final filter = SearchFilter(
+      filterText: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
       address: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
       checkInDate: _checkIn?.millisecondsSinceEpoch,
       checkOutDate: _checkOut?.millisecondsSinceEpoch,
+      maximumNumberOfGuestMin: _guests,
+      maximumNumberOfGuestMax: _guests + 2,
+      pricePerNightMin: 50, // Default minimum price
+      pricePerNightMax: 1000, // Default maximum price
     );
     
+    print('🔍 Navigating to search results with filter: ${filter.toJson()}');
     Navigator.of(context).pushNamed(
       '/search-results',
       arguments: {'filter': filter},
