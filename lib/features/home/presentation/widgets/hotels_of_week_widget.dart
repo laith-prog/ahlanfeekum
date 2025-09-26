@@ -72,8 +72,8 @@ class HotelsOfWeekWidget extends StatelessWidget {
 
   Widget _buildHostCard(double? rating, String name, String? avatarUrl) {
     return Container(
-      width: 175.w,
-      height: 75.h,
+      width: 170.w,
+      height: 70.h,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
