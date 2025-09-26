@@ -136,7 +136,7 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
       title,
       style: AppTextStyles.h4.copyWith(
         color: AppColors.textPrimary,
-        fontSize: 18.sp,
+        fontSize: 14.sp,
         fontWeight: FontWeight.w600,
       ),
     );
@@ -147,7 +147,7 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
       title,
       style: AppTextStyles.bodyMedium.copyWith(
         color: AppColors.textPrimary,
-        fontSize: 16.sp,
+        fontSize: 14.sp,
         fontWeight: FontWeight.w500,
       ),
     );
@@ -180,7 +180,7 @@ class _PropertyDetailsStepState extends State<PropertyDetailsStep> {
           hintText: hintText,
           hintStyle: AppTextStyles.bodyMedium.copyWith(
             color: Colors.grey[400],
-            fontSize: 14.sp,
+            fontSize: 12.sp,
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),

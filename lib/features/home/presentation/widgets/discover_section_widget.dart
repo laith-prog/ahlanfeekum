@@ -26,7 +26,7 @@ class DiscoverSectionWidget extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Row(
               children: [
-                Icon(Icons.do_not_disturb_on_outlined, color: Colors.redAccent, size: 18.sp),
+                Icon(Icons.sports_baseball_outlined, color: Colors.redAccent, size: 18.sp),
                 SizedBox(width: 8.w),
                 Text(
                   'Discover Your Ideal Stay',

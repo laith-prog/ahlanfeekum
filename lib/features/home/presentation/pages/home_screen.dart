@@ -81,7 +81,7 @@ class HomeScreen extends StatelessWidget {
                       // Special Advertisement Banner
                       AdvertisementBannerWidget(ads: state.homeData.specialAdvertisements),
 
-                      SizedBox(height: 8.h),
+                      SizedBox(height: 15.h),
 
                       // Special Stays Section
                       SpecialStaysWidget(properties: state.homeData.siteProperties),

@@ -72,6 +72,7 @@ SiteProperty _$SitePropertyFromJson(Map<String, dynamic> json) => SiteProperty(
       pricePerNight: (json['pricePerNight'] as num).toDouble(),
       isActive: json['isActive'] as bool,
       isFavorite: json['isFavorite'] as bool,
+      area: (json['area'] as num?)?.toDouble(),
       mainImage: json['mainImage'] as String?,
     );
 
@@ -87,6 +88,7 @@ Map<String, dynamic> _$SitePropertyToJson(SiteProperty instance) =>
       'pricePerNight': instance.pricePerNight,
       'isActive': instance.isActive,
       'isFavorite': instance.isFavorite,
+      'area': instance.area,
       'mainImage': instance.mainImage,
     };
 

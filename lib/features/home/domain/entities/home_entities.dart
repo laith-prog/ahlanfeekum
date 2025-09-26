@@ -44,6 +44,7 @@ class Property {
   final bool isFavorite;
   final String? mainImageUrl;
   final double? averageRating;
+  final double? area;
 
   const Property({
     required this.id,
@@ -57,6 +58,7 @@ class Property {
     required this.isFavorite,
     this.mainImageUrl,
     this.averageRating,
+    this.area,
   });
 
   String get displayLocation {

@@ -28,7 +28,6 @@ class OnlyForYouWidget extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Row(
               children: [
-                Icon(Icons.local_fire_department_outlined, color: Colors.orange, size: 18.sp),
                 SizedBox(width: 8.w),
                 Text(
                   'Only  For You !',

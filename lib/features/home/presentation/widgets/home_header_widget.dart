@@ -9,7 +9,7 @@ class HomeHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 140.h, // Slightly reduced height
+      height: 180.h, // Slightly reduced height
       width: double.infinity,
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -26,8 +26,8 @@ class HomeHeaderWidget extends StatelessWidget {
                 children: [
                   // App Logo
                   SizedBox(
-                    width: 100.w,
-                    height: 35.h,
+                    width: 120.w,
+                    height: 60.h,
                     child: Image.asset(
                       'assets/icons/logo.png',
                       fit: BoxFit.contain,

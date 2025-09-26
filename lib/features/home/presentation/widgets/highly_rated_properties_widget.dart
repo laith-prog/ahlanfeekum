@@ -23,7 +23,7 @@ class HighlyRatedPropertiesWidget extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Row(
               children: [
-                Icon(Icons.favorite, color: Colors.pinkAccent, size: 18.sp),
+                Icon(Icons.star_border_outlined, color: AppColors.primary, size: 24.sp),
                 SizedBox(width: 8.w),
                 Text(
                   'Highly Rated Properties',
@@ -84,28 +84,50 @@ class HighlyRatedPropertiesWidget extends StatelessWidget {
                                 child: Icon(Icons.home_outlined, color: AppColors.primary, size: 28.sp),
                               ),
                             ),
-                            if (property.averageRating != null)
+                            if (property.averageRating != null && property.averageRating! > 0)
                               Positioned(
                                 top: 8.h,
                                 left: 8.w,
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                                   decoration: BoxDecoration(
-                                    color: Colors.orange,
-                                    borderRadius: BorderRadius.circular(8.r),
+                                    color: Colors.amber,
+                                    borderRadius: BorderRadius.circular(12.r),
                                   ),
                                   child: Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(Icons.star, size: 12.sp, color: Colors.white),
-                                      SizedBox(width: 2.w),
+                                      SizedBox(width: 3.w),
                                       Text(
-                                        (property.averageRating!).toStringAsFixed(1),
-                                        style: AppTextStyles.bodySmall.copyWith(color: Colors.white, fontSize: 10.sp),
+                                        property.averageRating!.toStringAsFixed(1),
+                                        style: AppTextStyles.bodySmall.copyWith(
+                                          color: Colors.white, 
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
+                            // Heart icon (favorite) in top right
+                            Positioned(
+                              top: 8.h,
+                              right: 8.w,
+                              child: Container(
+                                padding: EdgeInsets.all(4.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.9),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.favorite_border,
+                                  color: Colors.grey[600],
+                                  size: 16.sp,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -128,25 +150,39 @@ class HighlyRatedPropertiesWidget extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              SizedBox(height: 2.h),
+                              SizedBox(height: 4.h),
+                              // Property type and distance row
                               Row(
                                 children: [
-                                  Icon(Icons.location_on_outlined, size: 10.sp, color: Colors.grey[500]),
-                                  SizedBox(width: 2.w),
-                                  Expanded(
-                                    child: Text(
-                                      property.displayLocation,
-                                      style: AppTextStyles.bodySmall.copyWith(color: Colors.grey[600], fontSize: 10.sp),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                  // Property type icon
+                                  Icon(
+                                    property.hotelName != null 
+                                        ? Icons.hotel 
+                                        : Icons.apartment,
+                                    size: 12.sp, 
+                                    color: Colors.grey[600],
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    property.hotelName != null ? 'Hotel' : 'Apartment',
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: Colors.grey[600], 
+                                      fontSize: 10.sp,
                                     ),
                                   ),
+                                  SizedBox(width: 8.w),
+                                  // Distance/Area
+                                  SizedBox(width: 2.w),
+                                   Text(
+                                     (property.area != null && property.area! > 0)
+                                         ? '${property.area!.toInt()} M²'
+                                         : '?? M', // Default distance when area is null or 0
+                                     style: AppTextStyles.bodySmall.copyWith(
+                                       color: AppColors.primary,
+                                       fontSize: 10.sp,
+                                     ),
+                                   ),
                                 ],
-                              ),
-                              SizedBox(height: 2.h),
-                              Text(
-                                '\$${property.pricePerNight.toStringAsFixed(0)} / Night',
-                                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary, fontSize: 11.sp, fontWeight: FontWeight.w700),
                               ),
                             ],
                           ),

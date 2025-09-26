@@ -60,6 +60,7 @@ class SiteProperty {
   final double pricePerNight;
   final bool isActive;
   final bool isFavorite;
+  final double? area;
   final String? mainImage;
 
   const SiteProperty({
@@ -73,6 +74,7 @@ class SiteProperty {
     required this.pricePerNight,
     required this.isActive,
     required this.isFavorite,
+    this.area,
     this.mainImage,
   });
 

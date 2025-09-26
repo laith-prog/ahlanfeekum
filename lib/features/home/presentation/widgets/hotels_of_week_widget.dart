@@ -20,7 +20,7 @@ class HotelsOfWeekWidget extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Row(
               children: [
-                Icon(Icons.star_border_rounded, color: Colors.orange, size: 18.sp),
+                Icon(Icons.local_attraction_outlined, color: AppColors.primary, size: 24.sp),
                 SizedBox(width: 8.w),
                 Text(
                   'Hotels Of The Week',

@@ -37,6 +37,8 @@ class HomeRepositoryImpl implements HomeRepository {
                 pricePerNight: dto.pricePerNight,
                 isActive: dto.isActive,
                 isFavorite: dto.isFavorite,
+                averageRating: dto.averageRating,
+                area: dto.area,
                 mainImageUrl: dto.mainImage != null 
                     ? _buildFullImageUrl(dto.mainImage!) 
                     : null,
@@ -54,6 +56,8 @@ class HomeRepositoryImpl implements HomeRepository {
                 pricePerNight: dto.pricePerNight,
                 isActive: dto.isActive,
                 isFavorite: dto.isFavorite,
+                averageRating: dto.averageRating,
+                area: dto.area,
                 mainImageUrl: dto.mainImage != null 
                     ? _buildFullImageUrl(dto.mainImage!) 
                     : null,
